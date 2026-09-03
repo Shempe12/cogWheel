@@ -1,0 +1,3451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CogWheel — Social Ads Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Outfit:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg2: #f0f4f8;
+    --bg3: #e8edf3;
+    --card: #ffffff;
+    --card2: #f5f8fb;
+    --accent: #f5c518;
+    --accent2: #e0b010;
+    --blue: #4a90d9;
+    --purple: #6b7a8d;
+    --green: #34d399;
+    --red: #f87171;
+    --text: #1a2035;
+    --text2: #4a5568;
+    --text3: #8d9db0;
+    --border: #dde3ea;
+    --border2: #c8d2dc;
+    --glow: rgba(74,144,217,0.12);
+    --sidebar-w: 260px;
+    --right-w: 300px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ===== SCROLLBAR ===== */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: var(--bg2); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 10px; }
+
+  /* ===== AUTH PAGE ===== */
+  #auth-page {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f0f4f8 0%, #e8f0fb 100%);
+    overflow-y: auto;
+    z-index: 9999;
+  }
+  #auth-page::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(245,197,24,0.15) 0%, transparent 70%);
+    top: -100px; right: -100px;
+    border-radius: 50%;
+    animation: pulse-glow 4s ease-in-out infinite;
+  }
+  #auth-page::after {
+    content: '';
+    position: absolute;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(74,144,217,0.12) 0%, transparent 70%);
+    bottom: -50px; left: -50px;
+    border-radius: 50%;
+    animation: pulse-glow 5s ease-in-out infinite reverse;
+  }
+  @keyframes pulse-glow {
+    0%,100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.15); opacity: 0.7; }
+  }
+  .auth-container {
+    background: var(--card);
+    border: 1px solid var(--border2);
+    border-radius: 24px;
+    padding: 48px;
+    width: 420px;
+    max-width: 95vw;
+    position: relative;
+    z-index: 2;
+    box-shadow: 0 40px 80px rgba(74,144,217,0.12), 0 0 0 1px rgba(245,197,24,0.08);
+    animation: slideUp 0.6s cubic-bezier(.23,1,.32,1);
+  }
+  @keyframes slideUp {
+    from { opacity:0; transform: translateY(40px); }
+    to { opacity:1; transform: translateY(0); }
+  }
+  .auth-logo {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  .auth-logo .logo-icon {
+    width:130px; height:110px;
+    display:inline-flex;
+    align-items:center; justify-content:center;
+    margin-bottom:12px;
+    background:transparent;
+    border:none; box-shadow:none; border-radius:0;
+    overflow:visible;
+  }
+  .auth-logo h1 {
+    font-family: 'Plus Jakarta Sans', 'DM Sans', sans-serif;
+    font-size: 38px;
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    line-height: 1;
+    margin: 0 0 10px 0;
+    display: block;
+    text-align: center;
+    /* NO gradient, NO webkit tricks — pure solid color per span */
+    background: none;
+    -webkit-text-fill-color: unset;
+    background-clip: unset;
+    -webkit-background-clip: unset;
+  }
+  .auth-logo h1 .cog-part {
+    color: #3a82d4;
+    -webkit-text-fill-color: #3a82d4;
+    background: none;
+  }
+  .auth-logo h1 .wheel-part {
+    color: #b89000;
+    -webkit-text-fill-color: #b89000;
+    background: none;
+  }
+  .auth-logo .tagline-wrap {
+    text-align: center;
+    margin-top: 6px;
+    margin-bottom: 6px;
+  }
+  .auth-logo .tagline-main {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #444;
+    letter-spacing: 0;
+    line-height: 1.2;
+  }
+  .auth-logo .tagline-sub {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12.5px;
+    font-weight: 400;
+    color: #888;
+    letter-spacing: 0.2px;
+    margin-top: 4px;
+    display: block;
+  }
+  .auth-logo p { display: none; }
+  .auth-tabs {
+    display: flex;
+    background: var(--bg2);
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 28px;
+  }
+  .auth-tab {
+    flex: 1;
+    padding: 10px;
+    text-align: center;
+    border-radius: 9px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text2);
+    transition: all 0.3s;
+    border: none;
+    background: transparent;
+  }
+  .auth-tab.active {
+    background: linear-gradient(135deg, var(--blue), #2176b8);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(74,144,217,0.3);
+  }
+  .form-group { margin-bottom: 18px; }
+  .form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text2);
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .form-group input {
+    width: 100%;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 13px 16px;
+    color: var(--text);
+    font-size: 15px;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.3s;
+    outline: none;
+  }
+  .form-group input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(74,144,217,0.15);
+  }
+  .btn-primary {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--blue), #2176b8);
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s;
+    letter-spacing: 0.3px;
+    box-shadow: 0 4px 20px rgba(74,144,217,0.3);
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(74,144,217,0.45);
+  }
+  .btn-primary:active { transform: translateY(0); }
+  .auth-divider {
+    text-align: center;
+    color: var(--text3);
+    font-size: 13px;
+    margin: 20px 0;
+    position: relative;
+  }
+  .auth-divider::before, .auth-divider::after {
+    content: '';
+    position: absolute;
+    top: 50%; width: 40%;
+    height: 1px;
+    background: var(--border);
+  }
+  .auth-divider::before { left: 0; }
+  .auth-divider::after { right: 0; }
+  .social-login {
+    display: flex;
+    gap: 10px;
+  }
+  .social-btn {
+    flex: 1;
+    padding: 11px 10px;
+    background: #fff;
+    border: 1.5px solid var(--border2);
+    border-radius: 10px;
+    color: #333;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s;
+    font-family: 'DM Sans', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .social-btn:hover {
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    transform: translateY(-1px);
+  }
+  .social-btn-google:hover { border-color: #4285F4; }
+  .social-btn-fb { background: #1877f2; border-color: #1877f2; color: #fff; }
+  .social-btn-fb:hover { background: #1565d8; border-color: #1565d8; box-shadow: 0 2px 10px rgba(24,119,242,0.4); }
+  .auth-form { display: none; }
+  .auth-form.active { display: block; }
+
+  /* ===== MAIN APP ===== */
+  #main-app {
+    display: none;
+    min-height: 100vh;
+  }
+  .app-layout {
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* ===== SIDEBAR ===== */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    position: fixed;
+    top: 0; left: 0;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s;
+  }
+  .sidebar-logo {
+    padding: 24px 20px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-logo .brand {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #1a5c9e, var(--blue), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .sidebar-logo .tagline {
+    font-size: 11px;
+    color: var(--text3);
+    margin-top: 2px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .sidebar-user {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .user-avatar {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue), #2176b8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+    color: #fff;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .user-avatar .online-dot {
+    position: absolute;
+    bottom: 1px; right: 1px;
+    width: 10px; height: 10px;
+    background: var(--green);
+    border-radius: 50%;
+    border: 2px solid var(--bg2);
+  }
+  .user-info .name {
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .user-info .role {
+    font-size: 12px;
+    color: var(--blue);
+  }
+  .sidebar-nav { flex: 1; padding: 16px 12px; }
+  .nav-section-title {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text3);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 8px 10px 6px;
+    margin-top: 8px;
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.25s;
+    margin-bottom: 3px;
+    color: var(--text2);
+    font-size: 14px;
+    font-weight: 500;
+    position: relative;
+  }
+  .nav-item:hover {
+    background: var(--card);
+    color: var(--text);
+  }
+  .nav-item.active {
+    background: linear-gradient(135deg, rgba(245,197,24,0.15), rgba(255,159,28,0.1));
+    color: var(--accent);
+    border: 1px solid rgba(255,107,53,0.2);
+  }
+  .nav-item .nav-icon { font-size: 18px; width: 22px; text-align: center; }
+  .nav-item .badge {
+    margin-left: auto;
+    background: var(--blue);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 20px;
+    min-width: 20px;
+    text-align: center;
+  }
+  .sidebar-bottom {
+    padding: 16px 12px;
+    border-top: 1px solid var(--border);
+  }
+  .btn-logout {
+    width: 100%;
+    padding: 10px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text2);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .btn-logout:hover {
+    border-color: var(--red);
+    color: var(--red);
+    background: rgba(248,113,113,0.08);
+  }
+
+  /* ===== MAIN CONTENT ===== */
+  .main-content {
+    margin-left: var(--sidebar-w);
+    margin-right: var(--right-w);
+    flex: 1;
+    min-height: 100vh;
+    padding: 0 0 80px;
+  }
+  .content-header {
+    position: sticky;
+    top: 0;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    z-index: 90;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .content-header h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+  }
+  .header-actions { display: flex; gap: 10px; align-items: center; }
+  .search-bar {
+    display: flex;
+    align-items: center;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 8px 14px;
+    gap: 8px;
+    transition: all 0.3s;
+  }
+  .search-bar:focus-within {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(74,144,217,0.1);
+  }
+  .search-bar input {
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    width: 200px;
+  }
+  .search-bar span { color: var(--text3); }
+  .icon-btn {
+    width: 38px; height: 38px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s;
+    position: relative;
+  }
+  .icon-btn:hover { border-color: var(--blue); background: rgba(74,144,217,0.08); }
+  .icon-btn .notif-dot {
+    position: absolute;
+    top: 6px; right: 6px;
+    width: 8px; height: 8px;
+    background: var(--accent2);
+    border-radius: 50%;
+    border: 2px solid var(--bg);
+  }
+
+  /* ===== SECTIONS ===== */
+  .section { display: none; padding: 24px; }
+  .section.active { display: block; }
+
+  /* ===== CREATE POST ===== */
+  .create-post-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 24px;
+    animation: fadeIn 0.5s ease;
+  }
+  @keyframes fadeIn { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform: translateY(0); } }
+  .create-post-top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+  .post-input-area {
+    flex: 1;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 13px 18px;
+    color: var(--text2);
+    font-size: 15px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .post-input-area:hover { border-color: var(--blue); color: var(--text); }
+  .create-post-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .action-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text2);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .action-btn:hover { color: var(--text); border-color: var(--border2); background: var(--bg3); }
+  .action-btn.photo:hover { color: var(--green); border-color: var(--green); }
+  .action-btn.video:hover { color: var(--blue); border-color: var(--blue); }
+  .action-btn.ad:hover { color: var(--accent); border-color: var(--accent); }
+  .btn-post {
+    margin-left: auto;
+    padding: 8px 22px;
+    background: linear-gradient(135deg, var(--blue), #2176b8);
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .btn-post:hover { box-shadow: 0 4px 16px rgba(74,144,217,0.4); transform: translateY(-1px); }
+
+  /* ===== POST MODAL ===== */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    backdrop-filter: blur(8px);
+    z-index: 500;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: var(--card);
+    border: 1px solid var(--border2);
+    border-radius: 24px;
+    width: 560px;
+    max-width: 95vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: modalIn 0.3s cubic-bezier(.23,1,.32,1);
+    box-shadow: 0 40px 80px rgba(74,144,217,0.15);
+  }
+  @keyframes modalIn { from { opacity:0; transform: scale(0.9) translateY(20px); } to { opacity:1; transform: scale(1) translateY(0); } }
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .modal-header h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .modal-close {
+    width: 32px; height: 32px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--text2);
+    transition: all 0.2s;
+  }
+  .modal-close:hover { background: var(--red); color: #fff; border-color: var(--red); }
+  .modal-body { padding: 24px; }
+  .modal-textarea {
+    width: 100%;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    color: var(--text);
+    font-size: 15px;
+    font-family: 'DM Sans', sans-serif;
+    resize: none;
+    height: 130px;
+    outline: none;
+    transition: all 0.3s;
+    margin-bottom: 16px;
+  }
+  .modal-textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(74,144,217,0.12); }
+  .modal-media-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .media-upload-btn {
+    background: var(--bg2);
+    border: 2px dashed var(--border2);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 13px;
+    color: var(--text2);
+  }
+  .media-upload-btn:hover { border-color: var(--blue); color: var(--blue); background: rgba(74,144,217,0.05); }
+  .media-upload-btn .upload-icon { font-size: 24px; margin-bottom: 6px; }
+  .audience-select {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .audience-chip {
+    padding: 6px 14px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    color: var(--text2);
+  }
+  .audience-chip.active {
+    background: rgba(74,144,217,0.12);
+    border-color: var(--blue);
+    color: #2176b8;
+  }
+  .modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+  .btn-cancel {
+    padding: 10px 20px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text2);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .btn-cancel:hover { border-color: var(--text2); color: var(--text); }
+  .btn-submit {
+    padding: 10px 24px;
+    background: linear-gradient(135deg, var(--blue), #2176b8);
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .btn-submit:hover { box-shadow: 0 4px 16px rgba(74,144,217,0.4); }
+
+  /* ===== FEED POSTS ===== */
+  .post-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 16px;
+    transition: all 0.3s;
+    animation: fadeIn 0.5s ease;
+  }
+  .post-card:hover { border-color: var(--border2); box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+  .post-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .post-user-info { flex: 1; }
+  .post-user-info .name { font-weight: 600; font-size: 14px; }
+  .post-user-info .meta { font-size: 12px; color: var(--text3); margin-top: 1px; }
+  .post-menu {
+    width: 32px; height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 18px;
+    color: var(--text3);
+    transition: all 0.2s;
+  }
+  .post-menu:hover { background: var(--bg2); color: var(--text); }
+  .post-text { font-size: 15px; line-height: 1.6; color: var(--text); margin-bottom: 14px; }
+  .post-image {
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 14px;
+    max-height: 300px;
+  }
+  .post-image img { width: 100%; object-fit: cover; }
+  .post-image-placeholder {
+    background: linear-gradient(135deg, var(--bg3), var(--card2));
+    height: 200px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 50px;
+    margin-bottom: 14px;
+    border: 1px solid var(--border);
+  }
+  .post-stats {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 12px;
+    font-size: 12px;
+    color: var(--text3);
+  }
+  .post-stats span { cursor: pointer; }
+  .post-stats span:hover { color: var(--text2); }
+  .post-divider { height: 1px; background: var(--border); margin-bottom: 12px; }
+  .post-actions {
+    display: flex;
+    justify-content: space-around;
+  }
+  .post-action-btn {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text2);
+    transition: all 0.25s;
+    background: none;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    flex: 1;
+    justify-content: center;
+  }
+  .post-action-btn:hover { background: var(--bg2); }
+  .post-action-btn.like:hover { color: var(--red); }
+  .post-action-btn.like.liked { color: var(--red); }
+  .post-action-btn.comment:hover { color: #2176b8; }
+  .post-action-btn.share:hover { color: var(--green); }
+
+  /* REACTIONS */
+  .reactions-popup {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--card2);
+    border: 1px solid var(--border2);
+    border-radius: 50px;
+    padding: 8px 12px;
+    display: flex;
+    gap: 6px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    z-index: 50;
+    display: none;
+  }
+  .reaction-btn {
+    font-size: 22px;
+    cursor: pointer;
+    transition: transform 0.2s;
+    padding: 2px;
+  }
+  .reaction-btn:hover { transform: scale(1.4); }
+  .post-action-wrap { position: relative; flex: 1; display: flex; justify-content: center; }
+  .post-action-wrap:hover .reactions-popup { display: flex; }
+
+  /* COMMENTS */
+  .comments-section {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+    display: none;
+  }
+  .comments-section.open { display: block; }
+  .comment-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+    animation: fadeIn 0.3s;
+  }
+  .comment-bubble {
+    background: var(--bg2);
+    border-radius: 14px;
+    padding: 10px 14px;
+    flex: 1;
+  }
+  .comment-bubble .commenter { font-weight: 600; font-size: 13px; margin-bottom: 3px; }
+  .comment-bubble .comment-text { font-size: 14px; color: var(--text2); }
+  .comment-input-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 10px;
+  }
+  .comment-input-row input {
+    flex: 1;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 9px 16px;
+    color: var(--text);
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    transition: all 0.3s;
+  }
+  .comment-input-row input:focus { border-color: var(--blue); }
+  .send-comment-btn {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--blue), #2176b8);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+  }
+  .send-comment-btn:hover { transform: scale(1.1); box-shadow: 0 4px 12px rgba(74,144,217,0.4); }
+
+  /* ===== STORY BAR ===== */
+  .stories-bar {
+    display: flex;
+    gap: 14px;
+    padding: 20px 24px 0;
+    overflow-x: auto;
+    margin-bottom: 4px;
+  }
+  .stories-bar::-webkit-scrollbar { height: 3px; }
+  .story-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .story-ring {
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue), var(--accent), var(--purple));
+    padding: 2.5px;
+    transition: transform 0.2s;
+  }
+  .story-ring:hover { transform: scale(1.08); }
+  .story-ring .inner {
+    width: 100%; height: 100%;
+    border-radius: 50%;
+    background: var(--card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    border: 2px solid var(--bg2);
+  }
+  .story-name { font-size: 11px; color: var(--text2); max-width: 60px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .story-add .story-ring {
+    background: var(--border2);
+    padding: 0;
+  }
+  .story-add .inner { font-size: 24px; background: var(--bg2); }
+
+  /* ===== ADS BANNER ===== */
+  .ad-banner {
+    background: linear-gradient(135deg, rgba(74,144,217,0.08), rgba(245,197,24,0.06));
+    border: 1px solid rgba(74,144,217,0.2);
+    border-radius: 16px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-left: 24px;
+    margin-right: 24px;
+  }
+  .ad-banner:hover { box-shadow: 0 8px 24px rgba(74,144,217,0.15); border-color: rgba(74,144,217,0.35); }
+  .ad-banner::before {
+    content: '';
+    position: absolute;
+    right: -30px; top: -30px;
+    width: 100px; height: 100px;
+    background: radial-gradient(circle, rgba(245,197,24,0.12), transparent 70%);
+    border-radius: 50%;
+  }
+  .ad-banner .ad-emoji { font-size: 36px; }
+  .ad-banner .ad-text { flex: 1; }
+  .ad-banner .ad-text strong { display: block; font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+  .ad-banner .ad-text span { font-size: 13px; color: var(--text2); }
+  .ad-banner .ad-cta {
+    padding: 8px 16px;
+    background: linear-gradient(135deg, var(--blue), #2176b8);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    white-space: nowrap;
+    transition: all 0.3s;
+  }
+  .ad-banner .ad-cta:hover { box-shadow: 0 4px 12px rgba(74,144,217,0.35); }
+  .ad-badge {
+    position: absolute;
+    top: 8px; right: 8px;
+    background: var(--accent);
+    color: var(--text);
+    font-size: 9px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+  }
+
+  /* ===== RIGHT SIDEBAR ===== */
+  .right-sidebar {
+    width: var(--right-w);
+    position: fixed;
+    top: 0; right: 0;
+    height: 100vh;
+    overflow-y: auto;
+    background: var(--bg2);
+    border-left: 1px solid var(--border);
+    padding: 20px 16px;
+    z-index: 80;
+  }
+  .right-section-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text3);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    margin-top: 20px;
+  }
+  .right-section-title:first-child { margin-top: 0; }
+  .suggested-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 4px;
+  }
+  .suggested-user:hover { background: var(--card); }
+  .suggested-user .sug-info { flex: 1; }
+  .suggested-user .sug-name { font-size: 13px; font-weight: 600; }
+  .suggested-user .sug-meta { font-size: 11px; color: var(--text3); }
+  .follow-btn {
+    padding: 5px 12px;
+    background: rgba(74,144,217,0.1);
+    border: 1px solid rgba(74,144,217,0.25);
+    border-radius: 8px;
+    color: #2176b8;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .follow-btn:hover { background: var(--blue); color: #fff; }
+  .follow-btn.following {
+    background: var(--bg2);
+    border-color: var(--border);
+    color: var(--text2);
+  }
+  .trending-item {
+    padding: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-bottom: 4px;
+    transition: all 0.2s;
+  }
+  .trending-item:hover { background: var(--card); }
+  .trending-item .t-topic { font-size: 13px; font-weight: 600; color: #2176b8; }
+  .trending-item .t-posts { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+  /* ===== MESSAGES ===== */
+  .messages-layout {
+    display: flex;
+    height: calc(100vh - 70px);
+  }
+  .msg-list {
+    width: 280px;
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    flex-shrink: 0;
+  }
+  .msg-list-header { padding: 16px; border-bottom: 1px solid var(--border); }
+  .msg-list-header h3 { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; }
+  .msg-search {
+    display: flex;
+    align-items: center;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 8px 12px;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .msg-search input {
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    flex: 1;
+  }
+  .conv-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-bottom: 1px solid rgba(37,45,69,0.5);
+  }
+  .conv-item:hover, .conv-item.active { background: var(--card); }
+  .conv-avatar {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue), var(--purple));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .conv-online {
+    position: absolute;
+    bottom: 1px; right: 1px;
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    border: 2px solid var(--bg2);
+  }
+  .conv-online.on { background: var(--green); }
+  .conv-online.off { background: var(--text3); }
+  .conv-info { flex: 1; min-width: 0; }
+  .conv-info .cname { font-size: 14px; font-weight: 600; }
+  .conv-info .clast { font-size: 12px; color: var(--text3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+  .conv-meta { text-align: right; }
+  .conv-meta .ctime { font-size: 11px; color: var(--text3); }
+  .conv-meta .cunread {
+    width: 18px; height: 18px;
+    background: var(--blue);
+    border-radius: 50%;
+    font-size: 10px;
+    font-weight: 700;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    margin-top: 4px;
+  }
+  .chat-window {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .chat-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--bg2);
+  }
+  .chat-header .back-btn { display: none; cursor: pointer; font-size: 20px; color: var(--text2); }
+  .chat-header .ch-info { flex: 1; }
+  .chat-header .ch-info .ch-name { font-weight: 700; font-size: 15px; }
+  .chat-header .ch-info .ch-status { font-size: 12px; color: var(--green); }
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .msg-bubble-wrap { display: flex; gap: 8px; max-width: 75%; }
+  .msg-bubble-wrap.sent { margin-left: auto; flex-direction: row-reverse; }
+  .msg-bubble {
+    background: var(--card2);
+    border-radius: 18px 18px 18px 4px;
+    padding: 10px 16px;
+    font-size: 14px;
+    line-height: 1.5;
+    border: 1px solid var(--border);
+    max-width: 100%;
+  }
+  .msg-bubble-wrap.sent .msg-bubble {
+    background: linear-gradient(135deg, var(--blue), #2176b8);
+    border: none;
+    border-radius: 18px 18px 4px 18px;
+    color: #fff;
+  }
+  .msg-time { font-size: 10px; color: var(--text3); margin-top: 4px; text-align: center; }
+  .chat-input-area {
+    padding: 14px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    background: var(--bg2);
+  }
+  .chat-input {
+    flex: 1;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 11px 18px;
+    color: var(--text);
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    transition: all 0.3s;
+  }
+  .chat-input:focus { border-color: var(--blue); }
+  .send-btn {
+    width: 42px; height: 42px;
+    background: linear-gradient(135deg, var(--blue), #2176b8);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    flex-shrink: 0;
+  }
+  .send-btn:hover { transform: scale(1.1); box-shadow: 0 4px 14px rgba(74,144,217,0.4); }
+
+  /* ===== NOTIFICATIONS ===== */
+  .notif-list { padding: 24px; }
+  .notif-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    margin-bottom: 10px;
+    transition: all 0.3s;
+    cursor: pointer;
+    animation: fadeIn 0.4s ease;
+  }
+  .notif-item:hover { border-color: var(--border2); transform: translateX(4px); }
+  .notif-item.unread { border-color: rgba(74,144,217,0.22); background: rgba(74,144,217,0.04); }
+  .notif-icon {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .notif-icon.like { background: rgba(248,113,113,0.15); }
+  .notif-icon.comment { background: rgba(74,144,217,0.12); }
+  .notif-icon.follow { background: rgba(107,122,141,0.12); }
+  .notif-icon.ad { background: rgba(245,197,24,0.15); }
+  .notif-content { flex: 1; }
+  .notif-content .notif-text { font-size: 14px; line-height: 1.5; }
+  .notif-content .notif-time { font-size: 12px; color: var(--text3); margin-top: 4px; }
+  .notif-dot {
+    width: 8px; height: 8px;
+    background: var(--blue);
+    border-radius: 50%;
+    margin-top: 6px;
+    flex-shrink: 0;
+  }
+
+  /* ===== STORE / FILES ===== */
+  .store-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+  }
+  .file-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px;
+    cursor: pointer;
+    transition: all 0.3s;
+    animation: fadeIn 0.5s ease;
+  }
+  .file-card:hover { border-color: var(--border2); transform: translateY(-4px); box-shadow: 0 12px 28px rgba(0,0,0,0.3); }
+  .file-icon {
+    font-size: 40px;
+    margin-bottom: 12px;
+    display: block;
+  }
+  .file-name { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .file-size { font-size: 12px; color: var(--text3); }
+  .file-date { font-size: 11px; color: var(--text3); margin-top: 8px; }
+  .file-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .file-tag {
+    padding: 3px 8px;
+    background: rgba(74,144,217,0.08);
+    border: 1px solid rgba(74,144,217,0.18);
+    border-radius: 6px;
+    font-size: 10px;
+    color: #2176b8;
+    font-weight: 600;
+  }
+  .store-header {
+    padding: 24px 24px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .store-header h3 { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; }
+  .upload-fab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: linear-gradient(135deg, var(--blue), #2176b8);
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.3s;
+  }
+  .upload-fab:hover { box-shadow: 0 4px 16px rgba(74,144,217,0.4); transform: translateY(-2px); }
+  .store-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    padding: 0 24px 24px;
+  }
+  .store-stat {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    text-align: center;
+  }
+  .store-stat .ss-val { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; color: #2176b8; }
+  .store-stat .ss-label { font-size: 12px; color: var(--text3); margin-top: 4px; }
+
+  /* ===== ALGORITHM MATCH BANNER ===== */
+  .algo-match-card {
+    background: linear-gradient(135deg, rgba(74,144,217,0.12), rgba(167,139,250,0.1));
+    border: 1px solid rgba(79,172,254,0.25);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+  .algo-match-card::after {
+    content: '🤖 AI';
+    position: absolute;
+    top: 8px; right: 8px;
+    background: #2176b8;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+  }
+  .algo-match-card .match-title { font-size: 12px; font-weight: 700; color: #2176b8; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .algo-match-card .match-user { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+  .algo-match-card .match-user .mu-name { font-size: 13px; font-weight: 600; }
+  .algo-match-card .match-user .mu-reason { font-size: 11px; color: var(--text3); }
+  .match-score {
+    margin-left: auto;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--green);
+    background: rgba(52,211,153,0.1);
+    padding: 3px 8px;
+    border-radius: 6px;
+  }
+
+  /* ===== POPUP TOAST (Location Message) ===== */
+  .location-popup {
+    position: fixed;
+    right: 320px;
+    top: 50%;
+    transform: translateY(-50%) translateX(20px);
+    background: var(--card);
+    border: 1px solid var(--border2);
+    border-radius: 20px;
+    padding: 24px;
+    width: 320px;
+    z-index: 999;
+    box-shadow: 0 20px 60px rgba(74,144,217,0.18), 0 0 0 1px rgba(245,197,24,0.08);
+    opacity: 0;
+    transition: all 0.5s cubic-bezier(.23,1,.32,1);
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .location-popup::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--blue), var(--accent), var(--purple));
+  }
+  .location-popup.show {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+    pointer-events: all;
+  }
+  .location-popup .lp-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .location-popup .lp-logo-wrap {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 2px solid var(--border2);
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(74,144,217,0.15);
+  }
+  .location-popup .lp-logo-wrap video {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .location-popup .lp-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; line-height: 1.3; color: var(--text); }
+  .location-popup .lp-body {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.6;
+    margin-bottom: 14px;
+  }
+  .location-popup .lp-body strong { color: #2176b8; font-weight: 700; }
+  .location-popup .lp-actions { display: flex; gap: 8px; }
+  .lp-accept {
+    flex: 1;
+    padding: 10px;
+    background: linear-gradient(135deg, var(--blue), #2176b8);
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.3s;
+  }
+  .lp-accept:hover { box-shadow: 0 4px 12px rgba(74,144,217,0.4); }
+  .lp-dismiss {
+    padding: 9px 12px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text2);
+    font-size: 13px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s;
+  }
+  .lp-dismiss:hover { color: var(--text); border-color: var(--border2); }
+  .lp-pulse {
+    position: absolute;
+    top: 12px; right: 12px;
+    width: 10px; height: 10px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: ripple 1.5s infinite;
+  }
+  /* Timer bar for popup auto-dismiss */
+  .lp-timer-bar {
+    height: 3px;
+    background: var(--bg2);
+    border-radius: 3px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .lp-timer-fill {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, var(--blue), var(--accent));
+    border-radius: 3px;
+    animation: timerShrink 45s linear forwards;
+  }
+  @keyframes timerShrink {
+    from { width: 100%; }
+    to { width: 0%; }
+  }
+  @keyframes ripple {
+    0% { box-shadow: 0 0 0 0 rgba(245,197,24,0.5); }
+    100% { box-shadow: 0 0 0 14px rgba(245,197,24,0); }
+  }
+
+  /* ===== MOBILE HAMBURGER ===== */
+  .mobile-nav-toggle {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 200;
+  }
+  .mobile-bottom-nav {
+    display: none !important;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: #fff;
+    border-top: 1px solid #e0e5ec;
+    z-index: 150;
+    padding: 6px 0 env(safe-area-inset-bottom, 8px);
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.07);
+  }
+  .mobile-bottom-nav.show-nav {
+    display: block !important;
+  }
+  .mobile-nav-items {
+    display: flex;
+    justify-content: space-around;
+    padding: 0 10px;
+  }
+  .mobile-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 6px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text3);
+    position: relative;
+  }
+  .mobile-nav-item .mn-label { font-size: 10px; font-weight: 600; }
+  .mobile-nav-item.active { color: var(--blue); }
+  .mobile-nav-item.mn-post {
+    background: linear-gradient(135deg, var(--blue), #2176b8);
+    color: #fff;
+    border-radius: 14px;
+    padding: 8px 18px;
+    margin-top: -10px;
+    box-shadow: 0 4px 14px rgba(74,144,217,0.4);
+  }
+  .mobile-nav-item .mn-badge {
+    position: absolute;
+    top: 2px; right: 6px;
+    width: 16px; height: 16px;
+    background: var(--blue);
+    border-radius: 50%;
+    font-size: 9px;
+    font-weight: 700;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--bg2);
+  }
+
+  /* ===== MISC ===== */
+  .empty-state {
+    text-align: center;
+    padding: 60px 24px;
+    color: var(--text3);
+  }
+  .empty-state .es-icon { font-size: 60px; margin-bottom: 16px; opacity: 0.5; }
+  .empty-state h3 { font-family: 'Syne', sans-serif; font-size: 18px; margin-bottom: 8px; color: var(--text2); }
+  .empty-state p { font-size: 14px; }
+
+  .tab-chips {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  .tab-chip {
+    padding: 7px 16px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    color: var(--text2);
+    white-space: nowrap;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .tab-chip.active {
+    background: rgba(74,144,217,0.1);
+    border-color: var(--blue);
+    color: #2176b8;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 1200px) {
+    .right-sidebar { display: none; }
+    .main-content { margin-right: 0; }
+    .location-popup { right: 20px; }
+  }
+  @media (max-width: 768px) {
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.open { transform: translateX(0); }
+    .main-content { margin-left: 0; margin-right: 0; padding-bottom: 70px; }
+    .content-header { padding: 14px 16px; }
+    .section { padding: 16px; }
+    .store-stats { grid-template-columns: repeat(3,1fr); gap: 8px; }
+    /* bottom nav visibility controlled by JS only via .show-nav class */
+    .messages-layout { flex-direction: column; }
+    .msg-list { width: 100%; height: 100%; display: none; }
+    .msg-list.show { display: block; }
+    .chat-window.hidden { display: none; }
+    .chat-header .back-btn { display: block; }
+    .search-bar input { width: 120px; }
+  }
+  @media (max-width: 480px) {
+    .auth-container { padding: 32px 24px; }
+    .stories-bar { padding: 16px 16px 0; }
+    .store-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .modal-media-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ===== SHIMMER LOADING ===== */
+  .shimmer {
+    background: linear-gradient(90deg, var(--bg2) 25%, var(--card) 50%, var(--bg2) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 8px;
+  }
+  @keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+  /* ===== PROFILE ===== */
+  .profile-banner {
+    height: 180px;
+    background: linear-gradient(135deg, #cce0f5, #d4e8f7, #e8f0fb);
+    border-radius: 16px 16px 0 0;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 0;
+  }
+  .profile-banner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%234a90d9' fill-opacity='0.06'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  .profile-info-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 0 0 16px 16px;
+    padding: 0 24px 24px;
+    margin-bottom: 24px;
+    border-top: none;
+  }
+  .profile-avatar-wrap {
+    margin-top: -40px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+  .profile-avatar {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue), #2176b8);
+    border: 4px solid var(--card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .profile-stat-row { display: flex; gap: 28px; margin: 12px 0; }
+  .profile-stat .ps-val { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; }
+  .profile-stat .ps-label { font-size: 12px; color: var(--text3); }
+
+  /* Algo indicator */
+  .algo-bar {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+  }
+  .algo-bar .ab-title { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .algo-bar .ab-progress { height: 6px; background: var(--bg); border-radius: 10px; overflow: hidden; }
+  .algo-bar .ab-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--blue), var(--accent));
+    border-radius: 10px;
+    transition: width 1.5s cubic-bezier(.23,1,.32,1);
+  }
+  .algo-bar .ab-label { font-size: 13px; color: var(--text2); margin-bottom: 6px; display: flex; justify-content: space-between; }
+
+  /* overlay for sidebar on mobile */
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 99;
+  }
+  .sidebar-overlay.show { display: block; }
+  @keyframes spinGearImg {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========================= AUTH PAGE ========================= -->
+<div id="auth-page">
+  <div class="auth-container">
+    <div class="auth-logo">
+      <div class="logo-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="22 22 192 176" style="width:100%;height:100%;display:block;overflow:visible;">
+  <defs>
+    <!-- Silver gradients for big gear -->
+    <radialGradient id="gSilverTeeth" cx="38%" cy="28%" r="68%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="25%" stop-color="#e8e8e8"/>
+      <stop offset="60%" stop-color="#c0c0c0"/>
+      <stop offset="100%" stop-color="#909090"/>
+    </radialGradient>
+    <radialGradient id="gSilverFace" cx="40%" cy="32%" r="65%">
+      <stop offset="0%" stop-color="#f0f0f0"/>
+      <stop offset="35%" stop-color="#d8d8d8"/>
+      <stop offset="70%" stop-color="#b8b8b8"/>
+      <stop offset="100%" stop-color="#888888"/>
+    </radialGradient>
+    <radialGradient id="gSilverRim" cx="38%" cy="28%" r="68%">
+      <stop offset="0%" stop-color="#e0e0e0"/>
+      <stop offset="50%" stop-color="#b0b0b0"/>
+      <stop offset="100%" stop-color="#787878"/>
+    </radialGradient>
+    <radialGradient id="gSilverDisk" cx="42%" cy="35%" r="62%">
+      <stop offset="0%" stop-color="#f5f5f5"/>
+      <stop offset="40%" stop-color="#d0d0d0"/>
+      <stop offset="100%" stop-color="#a0a0a0"/>
+    </radialGradient>
+    <!-- Blue gradients for small gear -->
+    <radialGradient id="gBlueTeeth" cx="34%" cy="26%" r="70%">
+      <stop offset="0%" stop-color="#80c8ff"/>
+      <stop offset="30%" stop-color="#4090e8"/>
+      <stop offset="70%" stop-color="#1a60c8"/>
+      <stop offset="100%" stop-color="#0a3890"/>
+    </radialGradient>
+    <radialGradient id="gBlueFace" cx="36%" cy="28%" r="68%">
+      <stop offset="0%" stop-color="#70b8ff"/>
+      <stop offset="35%" stop-color="#3878d8"/>
+      <stop offset="70%" stop-color="#1450b0"/>
+      <stop offset="100%" stop-color="#082880"/>
+    </radialGradient>
+    <radialGradient id="gBlueRim" cx="34%" cy="26%" r="70%">
+      <stop offset="0%" stop-color="#5898e8"/>
+      <stop offset="50%" stop-color="#1f60c0"/>
+      <stop offset="100%" stop-color="#0a3088"/>
+    </radialGradient>
+    <radialGradient id="gBlueDisk" cx="40%" cy="32%" r="64%">
+      <stop offset="0%" stop-color="#6aaaf0"/>
+      <stop offset="40%" stop-color="#2a68d0"/>
+      <stop offset="100%" stop-color="#0e3ca8"/>
+    </radialGradient>
+    <!-- Gold for center bolts -->
+    <radialGradient id="gGold" cx="32%" cy="25%" r="70%">
+      <stop offset="0%" stop-color="#fffbc0"/>
+      <stop offset="30%" stop-color="#f8d840"/>
+      <stop offset="65%" stop-color="#e0a000"/>
+      <stop offset="100%" stop-color="#8a5c00"/>
+    </radialGradient>
+    <radialGradient id="gGoldInner" cx="35%" cy="28%" r="65%">
+      <stop offset="0%" stop-color="#fff080"/>
+      <stop offset="50%" stop-color="#d09000"/>
+      <stop offset="100%" stop-color="#7a4800"/>
+    </radialGradient>
+    <!-- Drop shadow filter -->
+    <filter id="fShadow" x="-8%" y="-8%" width="120%" height="120%">
+      <feDropShadow dx="2" dy="3" stdDeviation="3" flood-color="#00000035"/>
+    </filter>
+    <filter id="fShadowSm" x="-10%" y="-10%" width="125%" height="125%">
+      <feDropShadow dx="1" dy="2" stdDeviation="2" flood-color="#00000030"/>
+    </filter>
+  </defs>
+
+  <!-- ===== BIG SILVER GEAR (28 teeth) center=(95,95) ===== -->
+  <g style="transform-origin:95px 95px; animation:bigCW 7s linear infinite;">
+    <!-- Gear teeth body -->
+    <path d="M 98.61 39.62 L 100.37 29.72 L 104.29 30.16 L 103.81 40.20 L 110.84 41.81 L 114.76 32.55 L 118.49 33.86 L 115.78 43.54 L 122.28 46.67 L 128.16 38.51 L 131.50 40.62 L 126.71 49.45 L 132.35 53.95 L 139.90 47.31 L 142.69 50.10 L 136.05 57.65 L 140.55 63.29 L 149.38 58.50 L 151.49 61.84 L 143.33 67.72 L 146.46 74.22 L 156.14 71.51 L 157.45 75.24 L 148.19 79.16 L 149.80 86.19 L 159.84 85.71 L 160.28 89.63 L 150.38 91.39 L 150.38 98.61 L 160.28 100.37 L 159.84 104.29 L 149.80 103.81 L 148.19 110.84 L 157.45 114.76 L 156.14 118.49 L 146.46 115.78 L 143.33 122.28 L 151.49 128.16 L 149.38 131.50 L 140.55 126.71 L 136.05 132.35 L 142.69 139.90 L 139.90 142.69 L 132.35 136.05 L 126.71 140.55 L 131.50 149.38 L 128.16 151.49 L 122.28 143.33 L 115.78 146.46 L 118.49 156.14 L 114.76 157.45 L 110.84 148.19 L 103.81 149.80 L 104.29 159.84 L 100.37 160.28 L 98.61 150.38 L 91.39 150.38 L 89.63 160.28 L 85.71 159.84 L 86.19 149.80 L 79.16 148.19 L 75.24 157.45 L 71.51 156.14 L 74.22 146.46 L 67.72 143.33 L 61.84 151.49 L 58.50 149.38 L 63.29 140.55 L 57.65 136.05 L 50.10 142.69 L 47.31 139.90 L 53.95 132.35 L 49.45 126.71 L 40.62 131.50 L 38.51 128.16 L 46.67 122.28 L 43.54 115.78 L 33.86 118.49 L 32.55 114.76 L 41.81 110.84 L 40.20 103.81 L 30.16 104.29 L 29.72 100.37 L 39.62 98.61 L 39.62 91.39 L 29.72 89.63 L 30.16 85.71 L 40.20 86.19 L 41.81 79.16 L 32.55 75.24 L 33.86 71.51 L 43.54 74.22 L 46.67 67.72 L 38.51 61.84 L 40.62 58.50 L 49.45 63.29 L 53.95 57.65 L 47.31 50.10 L 50.10 47.31 L 57.65 53.95 L 63.29 49.45 L 58.50 40.62 L 61.84 38.51 L 67.72 46.67 L 74.22 43.54 L 71.51 33.86 L 75.24 32.55 L 79.16 41.81 L 86.19 40.20 L 85.71 30.16 L 89.63 29.72 L 91.39 39.62 Z" fill="url(#gSilverTeeth)" filter="url(#fShadow)"/>
+    <!-- Rim ring outer edge (dark border) -->
+    <circle cx="95" cy="95" r="55.5" fill="url(#gSilverRim)"/>
+    <!-- Rim ring highlight (raised edge feel) -->
+    <circle cx="95" cy="95" r="53.5" fill="none" stroke="#d8d8d8" stroke-width="1.5"/>
+    <!-- Recessed disk face -->
+    <circle cx="95" cy="95" r="49.5" fill="url(#gSilverDisk)"/>
+    <!-- Inner rim shadow line -->
+    <circle cx="95" cy="95" r="49.5" fill="none" stroke="#909090" stroke-width="1"/>
+    <!-- Center bolt gold outer -->
+    <circle cx="95" cy="95" r="10" fill="url(#gGold)"/>
+    <!-- Center bolt gold inner -->
+    <circle cx="95" cy="95" r="6" fill="url(#gGoldInner)"/>
+    <!-- Center bolt highlight -->
+    <circle cx="92.5" cy="92.5" r="2.5" fill="#fffde0" opacity="0.7"/>
+  </g>
+
+  <!-- ===== SMALL BLUE GEAR (16 teeth) center=(169.30,153.05) ===== -->
+  <g style="transform-origin:169.30px 153.05px; animation:smCCW 4s linear infinite;">
+    <!-- Gear teeth body -->
+    <path d="M 172.90 121.54 L 174.65 116.00 L 178.53 116.78 L 178.03 122.56 L 184.69 125.32 L 188.42 120.87 L 191.71 123.07 L 189.03 128.22 L 194.13 133.32 L 199.28 130.64 L 201.47 133.92 L 197.03 137.66 L 199.79 144.32 L 205.57 143.82 L 206.34 147.69 L 200.81 149.44 L 200.81 156.65 L 206.34 158.40 L 205.57 162.28 L 199.79 161.78 L 197.03 168.44 L 201.47 172.17 L 199.28 175.46 L 194.13 172.78 L 189.03 177.88 L 191.71 183.03 L 188.42 185.22 L 184.69 180.78 L 178.03 183.54 L 178.53 189.32 L 174.65 190.09 L 172.90 184.56 L 165.69 184.56 L 163.94 190.09 L 160.07 189.32 L 160.57 183.54 L 153.91 180.78 L 150.17 185.22 L 146.89 183.03 L 149.57 177.88 L 144.47 172.78 L 139.32 175.46 L 137.12 172.17 L 141.57 168.44 L 138.81 161.78 L 133.03 162.28 L 132.25 158.40 L 137.79 156.65 L 137.79 149.44 L 132.25 147.69 L 133.03 143.82 L 138.81 144.32 L 141.57 137.66 L 137.12 133.92 L 139.32 130.64 L 144.47 133.32 L 149.57 128.22 L 146.89 123.07 L 150.17 120.87 L 153.91 125.32 L 160.57 122.56 L 160.07 116.78 L 163.94 116.00 L 165.69 121.54 Z" fill="url(#gBlueTeeth)" filter="url(#fShadowSm)"/>
+    <!-- Rim ring -->
+    <circle cx="169.30" cy="153.05" r="31.7" fill="url(#gBlueRim)"/>
+    <circle cx="169.30" cy="153.05" r="30.0" fill="none" stroke="#5080d8" stroke-width="1.2"/>
+    <!-- Recessed disk face -->
+    <circle cx="169.30" cy="153.05" r="27.0" fill="url(#gBlueDisk)"/>
+    <circle cx="169.30" cy="153.05" r="27.0" fill="none" stroke="#1448a0" stroke-width="0.8"/>
+    <!-- Center bolt -->
+    <circle cx="169.30" cy="153.05" r="7" fill="url(#gGold)"/>
+    <circle cx="169.30" cy="153.05" r="4" fill="url(#gGoldInner)"/>
+    <circle cx="167.3" cy="151.05" r="1.8" fill="#fffde0" opacity="0.7"/>
+  </g>
+
+  <style>
+    @keyframes bigCW  { from{transform:rotate(0deg)}   to{transform:rotate(360deg)} }
+    @keyframes smCCW  { from{transform:rotate(0deg)}   to{transform:rotate(-360deg)} }
+  </style>
+</svg></div>
+      <h1><span class="cog-part">cog</span><span class="wheel-part">Wheel</span></h1>
+      <div class="tagline-wrap">
+        <div class="tagline-main">Social Platform</div>
+        <span class="tagline-sub">Connect &middot; Create &middot; Convert &middot; Transfer motion.</span>
+      </div>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuthTab('login')">Sign In</button>
+      <button class="auth-tab" onclick="switchAuthTab('register')">Create Account</button>
+    </div>
+
+    <!-- Login Form -->
+    <div class="auth-form active" id="login-form">
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="login-email" placeholder="you@example.com">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <!-- 🔴 REAL AUTH NEEDED: this value is currently never read by
+             handleLogin() — it's decorative. Must be wired into a real
+             credential check (see handleLogin() comment block in <script>). -->
+        <input type="password" id="login-password" placeholder="••••••••">
+      </div>
+      <button class="btn-primary" onclick="handleLogin()">Sign In →</button>
+      <div class="auth-divider">or continue with</div>
+      <!-- 🔴 REAL AUTH NEEDED: both "social login" buttons below just call
+           handleLogin() — the same fake, credential-less function as the
+           email form. There is no actual Google/Facebook OAuth integration.
+           To make this real you need:
+             - A registered OAuth app with Google (Google Identity Services /
+               "Sign in with Google") and Meta (Facebook Login SDK).
+             - Client IDs/secrets configured, and a server-side callback that
+               exchanges the OAuth code/token for a verified identity, then
+               issues your own app session (do NOT trust client-side profile
+               data from the provider without server verification). -->
+      <div class="social-login">
+        <button class="social-btn social-btn-google" onclick="handleLogin()">
+          <svg width="20" height="20" viewBox="0 0 48 48" style="flex-shrink:0;display:block;">
+            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+          </svg>
+          Google
+        </button>
+        <button class="social-btn social-btn-fb" onclick="handleLogin()">
+          <svg width="20" height="20" viewBox="0 0 32 32" style="flex-shrink:0;display:block;">
+            <rect width="32" height="32" rx="6" fill="#1877F2"/>
+            <path fill="#fff" d="M21.5 16h-3v10h-4V16h-2v-3.5h2v-2c0-2.8 1.3-4.5 4.5-4.5H22V9.5h-2c-1.1 0-1.5.5-1.5 1.5v1.5h3.5L21.5 16z"/>
+          </svg>
+          Facebook
+        </button>
+      </div>
+    </div>
+
+    <!-- Register Form -->
+    <div class="auth-form" id="register-form">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="reg-name" placeholder="John Mukela">
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <!-- 🔴 REAL AUTH NEEDED: no format validation and no server-side
+             duplicate-email check exists anywhere. -->
+        <input type="email" id="reg-email" placeholder="you@example.com">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <!-- 🔴 REAL AUTH NEEDED: this value is currently never read by
+             handleRegister() — it's decorative. No strength validation,
+             no hashing, no storage. Must be wired into real registration
+             (see handleRegister() comment block in <script>). -->
+        <input type="password" id="reg-password" placeholder="Create a strong password">
+      </div>
+      <div class="form-group">
+        <label>Account Type</label>
+        <input type="text" id="reg-type" placeholder="Creator / Business / Customer">
+      </div>
+      <button class="btn-primary" onclick="handleRegister()">Create Account →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========================= MAIN APP ========================= -->
+<div id="main-app">
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+  <!-- LEFT SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo" style="display:flex;align-items:center;gap:10px;">
+      <div style="width:40px;height:40px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid var(--border2);background:#fff;padding:3px;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="22 22 192 176" style="width:100%;height:100%;display:block;overflow:visible;">
+  <defs>
+    <!-- Silver gradients for big gear -->
+    <radialGradient id="gSilverTeeth" cx="38%" cy="28%" r="68%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="25%" stop-color="#e8e8e8"/>
+      <stop offset="60%" stop-color="#c0c0c0"/>
+      <stop offset="100%" stop-color="#909090"/>
+    </radialGradient>
+    <radialGradient id="gSilverFace" cx="40%" cy="32%" r="65%">
+      <stop offset="0%" stop-color="#f0f0f0"/>
+      <stop offset="35%" stop-color="#d8d8d8"/>
+      <stop offset="70%" stop-color="#b8b8b8"/>
+      <stop offset="100%" stop-color="#888888"/>
+    </radialGradient>
+    <radialGradient id="gSilverRim" cx="38%" cy="28%" r="68%">
+      <stop offset="0%" stop-color="#e0e0e0"/>
+      <stop offset="50%" stop-color="#b0b0b0"/>
+      <stop offset="100%" stop-color="#787878"/>
+    </radialGradient>
+    <radialGradient id="gSilverDisk" cx="42%" cy="35%" r="62%">
+      <stop offset="0%" stop-color="#f5f5f5"/>
+      <stop offset="40%" stop-color="#d0d0d0"/>
+      <stop offset="100%" stop-color="#a0a0a0"/>
+    </radialGradient>
+    <!-- Blue gradients for small gear -->
+    <radialGradient id="gBlueTeeth" cx="34%" cy="26%" r="70%">
+      <stop offset="0%" stop-color="#80c8ff"/>
+      <stop offset="30%" stop-color="#4090e8"/>
+      <stop offset="70%" stop-color="#1a60c8"/>
+      <stop offset="100%" stop-color="#0a3890"/>
+    </radialGradient>
+    <radialGradient id="gBlueFace" cx="36%" cy="28%" r="68%">
+      <stop offset="0%" stop-color="#70b8ff"/>
+      <stop offset="35%" stop-color="#3878d8"/>
+      <stop offset="70%" stop-color="#1450b0"/>
+      <stop offset="100%" stop-color="#082880"/>
+    </radialGradient>
+    <radialGradient id="gBlueRim" cx="34%" cy="26%" r="70%">
+      <stop offset="0%" stop-color="#5898e8"/>
+      <stop offset="50%" stop-color="#1f60c0"/>
+      <stop offset="100%" stop-color="#0a3088"/>
+    </radialGradient>
+    <radialGradient id="gBlueDisk" cx="40%" cy="32%" r="64%">
+      <stop offset="0%" stop-color="#6aaaf0"/>
+      <stop offset="40%" stop-color="#2a68d0"/>
+      <stop offset="100%" stop-color="#0e3ca8"/>
+    </radialGradient>
+    <!-- Gold for center bolts -->
+    <radialGradient id="gGold" cx="32%" cy="25%" r="70%">
+      <stop offset="0%" stop-color="#fffbc0"/>
+      <stop offset="30%" stop-color="#f8d840"/>
+      <stop offset="65%" stop-color="#e0a000"/>
+      <stop offset="100%" stop-color="#8a5c00"/>
+    </radialGradient>
+    <radialGradient id="gGoldInner" cx="35%" cy="28%" r="65%">
+      <stop offset="0%" stop-color="#fff080"/>
+      <stop offset="50%" stop-color="#d09000"/>
+      <stop offset="100%" stop-color="#7a4800"/>
+    </radialGradient>
+    <!-- Drop shadow filter -->
+    <filter id="fShadow" x="-8%" y="-8%" width="120%" height="120%">
+      <feDropShadow dx="2" dy="3" stdDeviation="3" flood-color="#00000035"/>
+    </filter>
+    <filter id="fShadowSm" x="-10%" y="-10%" width="125%" height="125%">
+      <feDropShadow dx="1" dy="2" stdDeviation="2" flood-color="#00000030"/>
+    </filter>
+  </defs>
+
+  <!-- ===== BIG SILVER GEAR (28 teeth) center=(95,95) ===== -->
+  <g style="transform-origin:95px 95px; animation:bigCW 7s linear infinite;">
+    <!-- Gear teeth body -->
+    <path d="M 98.61 39.62 L 100.37 29.72 L 104.29 30.16 L 103.81 40.20 L 110.84 41.81 L 114.76 32.55 L 118.49 33.86 L 115.78 43.54 L 122.28 46.67 L 128.16 38.51 L 131.50 40.62 L 126.71 49.45 L 132.35 53.95 L 139.90 47.31 L 142.69 50.10 L 136.05 57.65 L 140.55 63.29 L 149.38 58.50 L 151.49 61.84 L 143.33 67.72 L 146.46 74.22 L 156.14 71.51 L 157.45 75.24 L 148.19 79.16 L 149.80 86.19 L 159.84 85.71 L 160.28 89.63 L 150.38 91.39 L 150.38 98.61 L 160.28 100.37 L 159.84 104.29 L 149.80 103.81 L 148.19 110.84 L 157.45 114.76 L 156.14 118.49 L 146.46 115.78 L 143.33 122.28 L 151.49 128.16 L 149.38 131.50 L 140.55 126.71 L 136.05 132.35 L 142.69 139.90 L 139.90 142.69 L 132.35 136.05 L 126.71 140.55 L 131.50 149.38 L 128.16 151.49 L 122.28 143.33 L 115.78 146.46 L 118.49 156.14 L 114.76 157.45 L 110.84 148.19 L 103.81 149.80 L 104.29 159.84 L 100.37 160.28 L 98.61 150.38 L 91.39 150.38 L 89.63 160.28 L 85.71 159.84 L 86.19 149.80 L 79.16 148.19 L 75.24 157.45 L 71.51 156.14 L 74.22 146.46 L 67.72 143.33 L 61.84 151.49 L 58.50 149.38 L 63.29 140.55 L 57.65 136.05 L 50.10 142.69 L 47.31 139.90 L 53.95 132.35 L 49.45 126.71 L 40.62 131.50 L 38.51 128.16 L 46.67 122.28 L 43.54 115.78 L 33.86 118.49 L 32.55 114.76 L 41.81 110.84 L 40.20 103.81 L 30.16 104.29 L 29.72 100.37 L 39.62 98.61 L 39.62 91.39 L 29.72 89.63 L 30.16 85.71 L 40.20 86.19 L 41.81 79.16 L 32.55 75.24 L 33.86 71.51 L 43.54 74.22 L 46.67 67.72 L 38.51 61.84 L 40.62 58.50 L 49.45 63.29 L 53.95 57.65 L 47.31 50.10 L 50.10 47.31 L 57.65 53.95 L 63.29 49.45 L 58.50 40.62 L 61.84 38.51 L 67.72 46.67 L 74.22 43.54 L 71.51 33.86 L 75.24 32.55 L 79.16 41.81 L 86.19 40.20 L 85.71 30.16 L 89.63 29.72 L 91.39 39.62 Z" fill="url(#gSilverTeeth)" filter="url(#fShadow)"/>
+    <!-- Rim ring outer edge (dark border) -->
+    <circle cx="95" cy="95" r="55.5" fill="url(#gSilverRim)"/>
+    <!-- Rim ring highlight (raised edge feel) -->
+    <circle cx="95" cy="95" r="53.5" fill="none" stroke="#d8d8d8" stroke-width="1.5"/>
+    <!-- Recessed disk face -->
+    <circle cx="95" cy="95" r="49.5" fill="url(#gSilverDisk)"/>
+    <!-- Inner rim shadow line -->
+    <circle cx="95" cy="95" r="49.5" fill="none" stroke="#909090" stroke-width="1"/>
+    <!-- Center bolt gold outer -->
+    <circle cx="95" cy="95" r="10" fill="url(#gGold)"/>
+    <!-- Center bolt gold inner -->
+    <circle cx="95" cy="95" r="6" fill="url(#gGoldInner)"/>
+    <!-- Center bolt highlight -->
+    <circle cx="92.5" cy="92.5" r="2.5" fill="#fffde0" opacity="0.7"/>
+  </g>
+
+  <!-- ===== SMALL BLUE GEAR (16 teeth) center=(169.30,153.05) ===== -->
+  <g style="transform-origin:169.30px 153.05px; animation:smCCW 4s linear infinite;">
+    <!-- Gear teeth body -->
+    <path d="M 172.90 121.54 L 174.65 116.00 L 178.53 116.78 L 178.03 122.56 L 184.69 125.32 L 188.42 120.87 L 191.71 123.07 L 189.03 128.22 L 194.13 133.32 L 199.28 130.64 L 201.47 133.92 L 197.03 137.66 L 199.79 144.32 L 205.57 143.82 L 206.34 147.69 L 200.81 149.44 L 200.81 156.65 L 206.34 158.40 L 205.57 162.28 L 199.79 161.78 L 197.03 168.44 L 201.47 172.17 L 199.28 175.46 L 194.13 172.78 L 189.03 177.88 L 191.71 183.03 L 188.42 185.22 L 184.69 180.78 L 178.03 183.54 L 178.53 189.32 L 174.65 190.09 L 172.90 184.56 L 165.69 184.56 L 163.94 190.09 L 160.07 189.32 L 160.57 183.54 L 153.91 180.78 L 150.17 185.22 L 146.89 183.03 L 149.57 177.88 L 144.47 172.78 L 139.32 175.46 L 137.12 172.17 L 141.57 168.44 L 138.81 161.78 L 133.03 162.28 L 132.25 158.40 L 137.79 156.65 L 137.79 149.44 L 132.25 147.69 L 133.03 143.82 L 138.81 144.32 L 141.57 137.66 L 137.12 133.92 L 139.32 130.64 L 144.47 133.32 L 149.57 128.22 L 146.89 123.07 L 150.17 120.87 L 153.91 125.32 L 160.57 122.56 L 160.07 116.78 L 163.94 116.00 L 165.69 121.54 Z" fill="url(#gBlueTeeth)" filter="url(#fShadowSm)"/>
+    <!-- Rim ring -->
+    <circle cx="169.30" cy="153.05" r="31.7" fill="url(#gBlueRim)"/>
+    <circle cx="169.30" cy="153.05" r="30.0" fill="none" stroke="#5080d8" stroke-width="1.2"/>
+    <!-- Recessed disk face -->
+    <circle cx="169.30" cy="153.05" r="27.0" fill="url(#gBlueDisk)"/>
+    <circle cx="169.30" cy="153.05" r="27.0" fill="none" stroke="#1448a0" stroke-width="0.8"/>
+    <!-- Center bolt -->
+    <circle cx="169.30" cy="153.05" r="7" fill="url(#gGold)"/>
+    <circle cx="169.30" cy="153.05" r="4" fill="url(#gGoldInner)"/>
+    <circle cx="167.3" cy="151.05" r="1.8" fill="#fffde0" opacity="0.7"/>
+  </g>
+
+  <style>
+    @keyframes bigCW  { from{transform:rotate(0deg)}   to{transform:rotate(360deg)} }
+    @keyframes smCCW  { from{transform:rotate(0deg)}   to{transform:rotate(-360deg)} }
+  </style>
+</svg></div>
+      <div><div class="brand">CogWheel</div><div class="tagline">Social Ads Platform</div></div>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-avatar" id="sidebar-avatar">
+        <div class="online-dot"></div>
+      </div>
+      <div class="user-info">
+        <div class="name" id="sidebar-name">User</div>
+        <div class="role" id="sidebar-role">Content Creator</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Main</div>
+      <div class="nav-item active" onclick="showSection('feed')">
+        <span class="nav-icon">🏠</span> Feed
+      </div>
+      <div class="nav-item" onclick="showSection('explore')">
+        <span class="nav-icon">🔍</span> Explore
+      </div>
+      <div class="nav-item" onclick="showSection('messages')">
+        <span class="nav-icon">💬</span> Messages
+        <span class="badge">3</span>
+      </div>
+      <div class="nav-item" onclick="showSection('notifications')">
+        <span class="nav-icon">🔔</span> Notifications
+        <span class="badge">7</span>
+      </div>
+      <div class="nav-section-title">Creator Tools</div>
+      <div class="nav-item" onclick="showSection('store')">
+        <span class="nav-icon">🗂️</span> My Store
+      </div>
+      <div class="nav-item" onclick="showSection('ads')">
+        <span class="nav-icon">📣</span> Ads Manager
+      </div>
+      <div class="nav-item" onclick="showSection('analytics')">
+        <span class="nav-icon">📊</span> Analytics
+      </div>
+      <div class="nav-section-title">Account</div>
+      <div class="nav-item" onclick="showSection('profile')">
+        <span class="nav-icon">👤</span> Profile
+      </div>
+      <div class="nav-item" onclick="showSection('settings')">
+        <span class="nav-icon">⚙️</span> Settings
+      </div>
+    </nav>
+    <div class="sidebar-bottom">
+      <button class="btn-logout" onclick="handleLogout()">🚪 Sign Out</button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+    <div class="content-header">
+      <h2 id="section-title">🏠 Feed</h2>
+      <div class="header-actions">
+        <div class="search-bar">
+          <span>🔍</span>
+          <input type="text" placeholder="Search people, posts...">
+        </div>
+        <div class="icon-btn" onclick="showSection('notifications')">
+          🔔<div class="notif-dot"></div>
+        </div>
+        <div class="icon-btn" onclick="showSection('messages')">💬</div>
+        <div class="icon-btn" onclick="toggleSidebar()">☰</div>
+      </div>
+    </div>
+
+    <!-- FEED SECTION -->
+    <div class="section active" id="section-feed">
+      <!-- Stories -->
+      <div class="stories-bar">
+        <div class="story-item story-add">
+          <div class="story-ring"><div class="inner">➕</div></div>
+          <div class="story-name">Add Story</div>
+        </div>
+        <div class="story-item" onclick="viewStory('Zola')">
+          <div class="story-ring"><div class="inner">👩🏾</div></div>
+          <div class="story-name">Zola M.</div>
+        </div>
+        <div class="story-item" onclick="viewStory('Chanda')">
+          <div class="story-ring"><div class="inner">🧑🏾</div></div>
+          <div class="story-name">Chanda</div>
+        </div>
+        <div class="story-item" onclick="viewStory('Bupe')">
+          <div class="story-ring"><div class="inner">👩🏿</div></div>
+          <div class="story-name">Bupe K.</div>
+        </div>
+        <div class="story-item" onclick="viewStory('Mutale')">
+          <div class="story-ring"><div class="inner">🧔🏿</div></div>
+          <div class="story-name">Mutale</div>
+        </div>
+        <div class="story-item" onclick="viewStory('Luyando')">
+          <div class="story-ring"><div class="inner">👩🏽</div></div>
+          <div class="story-name">Luyando</div>
+        </div>
+      </div>
+
+      <div style="padding: 20px 24px 0;">
+        <!-- Create Post Card -->
+        <div class="create-post-card">
+          <div class="create-post-top">
+            <div class="user-avatar" id="feed-avatar">JS</div>
+            <div class="post-input-area" onclick="openPostModal()">What's on your mind? Share something amazing...</div>
+          </div>
+          <div class="create-post-actions">
+            <button class="action-btn photo" onclick="openPostModal('photo')">📷 Photo</button>
+            <button class="action-btn video" onclick="openPostModal('video')">🎥 Video</button>
+            <button class="action-btn ad" onclick="openPostModal('ad')">📣 Boost Ad</button>
+            <button class="action-btn" onclick="openPostModal('poll')">📊 Poll</button>
+            <button class="btn-post" onclick="openPostModal()">Post</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sponsored Ad Banner -->
+      <div class="ad-banner" id="ad-banner">
+        <div class="ad-badge">SPONSORED</div>
+        <span class="ad-emoji">🛍️</span>
+        <div class="ad-text">
+          <strong>Ndola's #1 Fashion Boutique — New Arrivals!</strong>
+          <span>Get 30% off your first order. Trendy clothes for all occasions.</span>
+        </div>
+        <button class="ad-cta">Shop Now</button>
+      </div>
+
+      <!-- Posts Feed -->
+      <div id="posts-container" style="padding: 0 24px;"></div>
+    </div>
+
+    <!-- EXPLORE SECTION -->
+    <div class="section" id="section-explore">
+      <div class="tab-chips">
+        <button class="tab-chip active">All</button>
+        <button class="tab-chip" onclick="activateChip(this)">🔥 Trending</button>
+        <button class="tab-chip" onclick="activateChip(this)">👥 People</button>
+        <button class="tab-chip" onclick="activateChip(this)">🏢 Business</button>
+        <button class="tab-chip" onclick="activateChip(this)">📣 Ads</button>
+        <button class="tab-chip" onclick="activateChip(this)">🎓 Creators</button>
+      </div>
+      <div style="display:grid; grid-template-columns: repeat(auto-fill,minmax(180px,1fr)); gap:14px;">
+        <!-- Explore cards generated by JS -->
+      </div>
+      <div id="explore-grid"></div>
+    </div>
+
+    <!-- MESSAGES SECTION -->
+    <div class="section" id="section-messages" style="padding:0;">
+      <div class="messages-layout">
+        <div class="msg-list show" id="msg-list">
+          <div class="msg-list-header">
+            <h3>Messages</h3>
+            <div class="msg-search">
+              <span style="font-size:14px;color:var(--text3)">🔍</span>
+              <input type="text" placeholder="Search conversations...">
+            </div>
+          </div>
+          <div id="conversations-list"></div>
+        </div>
+        <div class="chat-window" id="chat-window">
+          <div class="chat-header">
+            <div class="back-btn" onclick="backToConvList()">←</div>
+            <div class="conv-avatar" id="chat-avatar" style="background:linear-gradient(135deg,#4facfe,#a78bfa)">Z</div>
+            <div class="ch-info">
+              <div class="ch-name" id="chat-name">Select a conversation</div>
+              <div class="ch-status" id="chat-status">● Online</div>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <div class="icon-btn">📞</div>
+              <div class="icon-btn">🎥</div>
+              <div class="icon-btn">⋮</div>
+            </div>
+          </div>
+          <div class="chat-messages" id="chat-messages">
+            <div class="empty-state">
+              <div class="es-icon">💬</div>
+              <h3>Start a Conversation</h3>
+              <p>Select a contact to start messaging</p>
+            </div>
+          </div>
+          <div class="chat-input-area">
+            <div class="icon-btn">😊</div>
+            <div class="icon-btn">📎</div>
+            <input class="chat-input" id="chat-input" type="text" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMessage()">
+            <button class="send-btn" onclick="sendMessage()">➤</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTIFICATIONS SECTION -->
+    <div class="section" id="section-notifications">
+      <div class="tab-chips">
+        <button class="tab-chip active">All</button>
+        <button class="tab-chip" onclick="activateChip(this)">❤️ Reactions</button>
+        <button class="tab-chip" onclick="activateChip(this)">💬 Comments</button>
+        <button class="tab-chip" onclick="activateChip(this)">👥 Follows</button>
+        <button class="tab-chip" onclick="activateChip(this)">📣 Ads</button>
+      </div>
+      <div id="notifications-list"></div>
+    </div>
+
+    <!-- STORE SECTION -->
+    <div class="section" id="section-store" style="padding:0;">
+      <div class="store-header">
+        <h3>🗂️ My Content Store</h3>
+        <button class="upload-fab" onclick="openUploadModal()">
+          ⬆️ Upload File
+        </button>
+      </div>
+      <div class="store-stats" id="store-stats-area">
+        <div class="store-stat"><div class="ss-val">24</div><div class="ss-label">Files</div></div>
+        <div class="store-stat"><div class="ss-val">1.2 GB</div><div class="ss-label">Used</div></div>
+        <div class="store-stat"><div class="ss-val">5 GB</div><div class="ss-label">Total</div></div>
+      </div>
+      <div style="padding: 0 24px 24px;">
+        <div class="tab-chips">
+          <button class="tab-chip active">All Files</button>
+          <button class="tab-chip" onclick="activateChip(this)">🖼️ Images</button>
+          <button class="tab-chip" onclick="activateChip(this)">🎥 Videos</button>
+          <button class="tab-chip" onclick="activateChip(this)">📄 Docs</button>
+          <button class="tab-chip" onclick="activateChip(this)">🎵 Audio</button>
+        </div>
+        <div class="store-grid" id="store-grid"></div>
+      </div>
+    </div>
+
+    <!-- ADS SECTION -->
+    <div class="section" id="section-ads">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;margin-bottom:24px;">
+        <div class="store-stat" style="text-align:left;padding:20px;border-radius:16px;background:var(--card);">
+          <div style="font-size:28px;margin-bottom:6px">👁️</div>
+          <div class="ss-val">12,540</div><div class="ss-label">Total Impressions</div>
+        </div>
+        <div class="store-stat" style="text-align:left;padding:20px;border-radius:16px;background:var(--card);">
+          <div style="font-size:28px;margin-bottom:6px">🖱️</div>
+          <div class="ss-val">1,230</div><div class="ss-label">Total Clicks</div>
+        </div>
+        <div class="store-stat" style="text-align:left;padding:20px;border-radius:16px;background:var(--card);">
+          <div style="font-size:28px;margin-bottom:6px">💰</div>
+          <div class="ss-val">K 850</div><div class="ss-label">Ad Spend</div>
+        </div>
+        <div class="store-stat" style="text-align:left;padding:20px;border-radius:16px;background:var(--card);">
+          <div style="font-size:28px;margin-bottom:6px">🎯</div>
+          <div class="ss-val">9.8%</div><div class="ss-label">CTR Rate</div>
+        </div>
+      </div>
+      <div class="create-post-card">
+        <h3 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:16px;">🚀 Create New Ad Campaign</h3>
+        <div class="form-group"><label>Campaign Name</label><input type="text" placeholder="e.g. Ndola Fashion Sale 2026" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 16px;color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;outline:none;"></div>
+        <div class="form-group" style="margin-top:16px;"><label>Target Audience</label>
+          <div class="audience-select">
+            <div class="audience-chip active" onclick="toggleChip(this)">📍 Ndola</div>
+            <div class="audience-chip" onclick="toggleChip(this)">🏙️ Copperbelt</div>
+            <div class="audience-chip" onclick="toggleChip(this)">🌍 Zambia</div>
+            <div class="audience-chip" onclick="toggleChip(this)">🌐 Global</div>
+          </div>
+        </div>
+        <button class="btn-primary" style="margin-top:8px;" onclick="createAd()">Launch Campaign 🚀</button>
+      </div>
+    </div>
+
+    <!-- ANALYTICS SECTION -->
+    <div class="section" id="section-analytics">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:24px;">
+        <div class="store-stat" style="text-align:left;padding:20px;border-radius:16px;background:var(--card);border:1px solid var(--border);">
+          <div style="font-size:28px;margin-bottom:6px">👥</div>
+          <div class="ss-val">2,847</div><div class="ss-label">Followers</div>
+        </div>
+        <div class="store-stat" style="text-align:left;padding:20px;border-radius:16px;background:var(--card);border:1px solid var(--border);">
+          <div style="font-size:28px;margin-bottom:6px">❤️</div>
+          <div class="ss-val">14.2K</div><div class="ss-label">Total Likes</div>
+        </div>
+        <div class="store-stat" style="text-align:left;padding:20px;border-radius:16px;background:var(--card);border:1px solid var(--border);">
+          <div style="font-size:28px;margin-bottom:6px">🔄</div>
+          <div class="ss-val">1,890</div><div class="ss-label">Shares</div>
+        </div>
+        <div class="store-stat" style="text-align:left;padding:20px;border-radius:16px;background:var(--card);border:1px solid var(--border);">
+          <div style="font-size:28px;margin-bottom:6px">📈</div>
+          <div class="ss-val">+23%</div><div class="ss-label">Growth</div>
+        </div>
+      </div>
+      <div class="create-post-card">
+        <h3 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:16px;">📊 Engagement Over Time</h3>
+        <div style="display:flex;align-items:flex-end;gap:6px;height:120px;padding:8px;">
+          <div style="flex:1;background:rgba(74,144,217,0.4);border-radius:6px 6px 0 0;height:40%;" title="Mon"></div>
+          <div style="flex:1;background:rgba(74,144,217,0.5);border-radius:6px 6px 0 0;height:65%;" title="Tue"></div>
+          <div style="flex:1;background:rgba(74,144,217,0.65);border-radius:6px 6px 0 0;height:80%;" title="Wed"></div>
+          <div style="flex:1;background:rgba(74,144,217,0.5);border-radius:6px 6px 0 0;height:55%;" title="Thu"></div>
+          <div style="flex:1;background:linear-gradient(var(--blue),#2176b8);border-radius:6px 6px 0 0;height:100%;box-shadow:0 0 14px rgba(74,144,217,0.4);" title="Fri"></div>
+          <div style="flex:1;background:rgba(74,144,217,0.45);border-radius:6px 6px 0 0;height:70%;" title="Sat"></div>
+          <div style="flex:1;background:rgba(74,144,217,0.35);border-radius:6px 6px 0 0;height:45%;" title="Sun"></div>
+        </div>
+        <div style="display:flex;gap:6px;padding:0 8px;">
+          <div style="flex:1;text-align:center;font-size:11px;color:var(--text3)">Mon</div>
+          <div style="flex:1;text-align:center;font-size:11px;color:var(--text3)">Tue</div>
+          <div style="flex:1;text-align:center;font-size:11px;color:var(--text3)">Wed</div>
+          <div style="flex:1;text-align:center;font-size:11px;color:var(--text3)">Thu</div>
+          <div style="flex:1;text-align:center;font-size:11px;color:#2176b8;font-weight:700">Fri</div>
+          <div style="flex:1;text-align:center;font-size:11px;color:var(--text3)">Sat</div>
+          <div style="flex:1;text-align:center;font-size:11px;color:var(--text3)">Sun</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROFILE SECTION -->
+    <div class="section" id="section-profile">
+      <div class="profile-banner"></div>
+      <div class="profile-info-card">
+        <div class="profile-avatar-wrap">
+          <div class="profile-avatar" id="profile-avatar">JS</div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn-cancel" style="border-radius:10px;font-family:'DM Sans',sans-serif;">✏️ Edit</button>
+            <button class="btn-submit" onclick="openPostModal()">+ Create Post</button>
+          </div>
+        </div>
+        <div>
+          <h2 id="profile-name" style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;"></h2>
+          <p style="color:#2176b8;font-size:14px;font-weight:600;margin-top:4px;" id="profile-role">Content Creator • Ndola, Zambia 📍</p>
+          <p style="color:var(--text2);font-size:14px;margin-top:8px;line-height:1.6;">Building connections and growing brands in Zambia 🚀 Content creator | Ad specialist | Digital entrepreneur</p>
+        </div>
+        <div class="profile-stat-row">
+          <div class="profile-stat"><div class="ps-val">48</div><div class="ps-label">Posts</div></div>
+          <div class="profile-stat"><div class="ps-val">2.8K</div><div class="ps-label">Followers</div></div>
+          <div class="profile-stat"><div class="ps-val">340</div><div class="ps-label">Following</div></div>
+          <div class="profile-stat"><div class="ps-val">14.2K</div><div class="ps-label">Likes</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS SECTION -->
+    <div class="section" id="section-settings">
+      <div class="create-post-card">
+        <h3 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:20px;">⚙️ Settings</h3>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--bg2);border-radius:12px;">
+            <div><div style="font-weight:600;font-size:14px;">🔔 Push Notifications</div><div style="font-size:12px;color:var(--text3);margin-top:2px;">Get notified about new activity</div></div>
+            <div style="width:44px;height:24px;background:var(--blue);border-radius:12px;cursor:pointer;position:relative;"><div style="width:20px;height:20px;background:#fff;border-radius:50%;position:absolute;right:2px;top:2px;transition:all 0.3s;"></div></div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--bg2);border-radius:12px;">
+            <div><div style="font-weight:600;font-size:14px;">📍 Location Services</div><div style="font-size:12px;color:var(--text3);margin-top:2px;">Help find nearby connections</div></div>
+            <div style="width:44px;height:24px;background:var(--blue);border-radius:12px;cursor:pointer;position:relative;"><div style="width:20px;height:20px;background:#fff;border-radius:50%;position:absolute;right:2px;top:2px;"></div></div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--bg2);border-radius:12px;">
+            <div><div style="font-weight:600;font-size:14px;">🤖 AI Recommendations</div><div style="font-size:12px;color:var(--text3);margin-top:2px;">Smart matching algorithm</div></div>
+            <div style="width:44px;height:24px;background:var(--blue);border-radius:12px;cursor:pointer;position:relative;"><div style="width:20px;height:20px;background:#fff;border-radius:50%;position:absolute;right:2px;top:2px;"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- RIGHT SIDEBAR -->
+  <aside class="right-sidebar">
+    <div class="right-section-title">🤖 AI Match for You</div>
+    <div class="algo-bar">
+      <div class="ab-label"><span>Profile Visibility</span><span style="color:#2176b8">87%</span></div>
+      <div class="ab-progress"><div class="ab-fill" style="width:0%" id="vis-bar"></div></div>
+    </div>
+    <div class="algo-match-card">
+      <div class="match-title">Potential Customers Near You</div>
+      <div class="match-user">
+        <div class="user-avatar" style="width:34px;height:34px;font-size:14px;background:linear-gradient(135deg,var(--green),var(--blue))">TM</div>
+        <div><div class="mu-name">Tasha Mwale</div><div class="mu-reason">Ndola • Likes Fashion</div></div>
+        <div class="match-score">94%</div>
+      </div>
+      <div class="match-user">
+        <div class="user-avatar" style="width:34px;height:34px;font-size:14px;background:linear-gradient(135deg,var(--purple),var(--blue))">CM</div>
+        <div><div class="mu-name">Chanda M.</div><div class="mu-reason">Ndola • Tech Buyer</div></div>
+        <div class="match-score">88%</div>
+      </div>
+    </div>
+
+    <div class="right-section-title">👥 Suggested For You</div>
+    <div id="suggested-users"></div>
+
+    <div class="right-section-title">🔥 Trending in Ndola</div>
+    <div id="trending-topics"></div>
+
+    <div class="right-section-title">📣 Sponsored</div>
+    <div style="background:linear-gradient(135deg,rgba(74,144,217,0.08),rgba(245,197,24,0.05));border:1px solid rgba(74,144,217,0.18);border-radius:14px;padding:14px;cursor:pointer;">
+      <div style="font-size:32px;text-align:center;margin-bottom:8px;">🛒</div>
+      <div style="font-size:13px;font-weight:700;text-align:center;margin-bottom:4px;">ShopZambia.com</div>
+      <div style="font-size:11px;color:var(--text3);text-align:center;margin-bottom:10px;">Shop local, support Zambian businesses</div>
+      <button style="width:100%;padding:8px;background:linear-gradient(135deg,var(--blue),#2176b8);border:none;border-radius:8px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">Visit Store →</button>
+    </div>
+  </aside>
+</div>
+
+<!-- ========================= POST MODAL ========================= -->
+<div class="modal-overlay" id="post-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>✍️ Create a Post</h3>
+      <div class="modal-close" onclick="closeModal('post-modal')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <div class="user-avatar" id="modal-avatar">JS</div>
+        <div>
+          <div style="font-weight:600;font-size:14px;" id="modal-name">User</div>
+          <div class="audience-select" style="margin:0;margin-top:4px;">
+            <div class="audience-chip active" onclick="toggleChip(this)">🌍 Public</div>
+            <div class="audience-chip" onclick="toggleChip(this)">👥 Friends</div>
+            <div class="audience-chip" onclick="toggleChip(this)">🔒 Only Me</div>
+          </div>
+        </div>
+      </div>
+      <textarea class="modal-textarea" id="post-textarea" placeholder="What's on your mind? Share something amazing with your audience..."></textarea>
+      <div class="modal-media-grid">
+        <div class="media-upload-btn" onclick="triggerFile('image')">
+          <div class="upload-icon">🖼️</div>
+          <div>Add Photo</div>
+        </div>
+        <div class="media-upload-btn" onclick="triggerFile('video')">
+          <div class="upload-icon">🎬</div>
+          <div>Add Video</div>
+        </div>
+      </div>
+      <input type="file" id="file-input-image" accept="image/*" style="display:none" onchange="handleFileUpload(this,'image')">
+      <input type="file" id="file-input-video" accept="video/*" style="display:none" onchange="handleFileUpload(this,'video')">
+      <div id="media-preview"></div>
+      <div style="background:linear-gradient(135deg,rgba(255,107,53,0.08),rgba(167,139,250,0.05));border:1px solid rgba(255,107,53,0.2);border-radius:12px;padding:12px;font-size:13px;color:var(--text2);">
+        <span style="color:#2176b8;font-weight:700;">🤖 AI Tip:</span> Posts with visuals get 3x more engagement. Tag your location to reach nearby customers in Ndola!
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('post-modal')">Cancel</button>
+      <button class="btn-submit" onclick="submitPost()">🚀 Publish Post</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========================= UPLOAD MODAL ========================= -->
+<div class="modal-overlay" id="upload-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>⬆️ Upload to Store</h3>
+      <div class="modal-close" onclick="closeModal('upload-modal')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div class="media-upload-btn" style="padding:40px;margin-bottom:16px;" onclick="document.getElementById('store-file-input').click()">
+        <div class="upload-icon">📁</div>
+        <div style="font-size:15px;font-weight:600;margin-bottom:4px;">Click to upload or drag & drop</div>
+        <div style="font-size:12px;">Images, Videos, PDFs, Audio files up to 500MB</div>
+      </div>
+      <input type="file" id="store-file-input" style="display:none" onchange="handleStoreUpload(this)">
+      <div class="form-group">
+        <label>File Description</label>
+        <input type="text" id="file-desc" placeholder="Describe this file...">
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;" id="file-tags-area">
+        <div class="audience-chip active" onclick="toggleChip(this)">📸 Photo</div>
+        <div class="audience-chip" onclick="toggleChip(this)">🎥 Video</div>
+        <div class="audience-chip" onclick="toggleChip(this)">📄 Document</div>
+        <div class="audience-chip" onclick="toggleChip(this)">🎵 Audio</div>
+        <div class="audience-chip" onclick="toggleChip(this)">📣 Ad Content</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('upload-modal')">Cancel</button>
+      <button class="btn-submit" onclick="uploadFile()">⬆️ Upload File</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========================= LOCATION POPUP ========================= -->
+<div class="location-popup" id="location-popup">
+  <div class="lp-pulse"></div>
+  <div class="lp-header" style="gap:12px;">
+    <div class="lp-logo-wrap" style="width:48px;height:48px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid var(--border2);background:#fff;padding:3px;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="22 22 192 176" style="width:100%;height:100%;display:block;overflow:visible;">
+  <defs>
+    <!-- Silver gradients for big gear -->
+    <radialGradient id="gSilverTeeth" cx="38%" cy="28%" r="68%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="25%" stop-color="#e8e8e8"/>
+      <stop offset="60%" stop-color="#c0c0c0"/>
+      <stop offset="100%" stop-color="#909090"/>
+    </radialGradient>
+    <radialGradient id="gSilverFace" cx="40%" cy="32%" r="65%">
+      <stop offset="0%" stop-color="#f0f0f0"/>
+      <stop offset="35%" stop-color="#d8d8d8"/>
+      <stop offset="70%" stop-color="#b8b8b8"/>
+      <stop offset="100%" stop-color="#888888"/>
+    </radialGradient>
+    <radialGradient id="gSilverRim" cx="38%" cy="28%" r="68%">
+      <stop offset="0%" stop-color="#e0e0e0"/>
+      <stop offset="50%" stop-color="#b0b0b0"/>
+      <stop offset="100%" stop-color="#787878"/>
+    </radialGradient>
+    <radialGradient id="gSilverDisk" cx="42%" cy="35%" r="62%">
+      <stop offset="0%" stop-color="#f5f5f5"/>
+      <stop offset="40%" stop-color="#d0d0d0"/>
+      <stop offset="100%" stop-color="#a0a0a0"/>
+    </radialGradient>
+    <!-- Blue gradients for small gear -->
+    <radialGradient id="gBlueTeeth" cx="34%" cy="26%" r="70%">
+      <stop offset="0%" stop-color="#80c8ff"/>
+      <stop offset="30%" stop-color="#4090e8"/>
+      <stop offset="70%" stop-color="#1a60c8"/>
+      <stop offset="100%" stop-color="#0a3890"/>
+    </radialGradient>
+    <radialGradient id="gBlueFace" cx="36%" cy="28%" r="68%">
+      <stop offset="0%" stop-color="#70b8ff"/>
+      <stop offset="35%" stop-color="#3878d8"/>
+      <stop offset="70%" stop-color="#1450b0"/>
+      <stop offset="100%" stop-color="#082880"/>
+    </radialGradient>
+    <radialGradient id="gBlueRim" cx="34%" cy="26%" r="70%">
+      <stop offset="0%" stop-color="#5898e8"/>
+      <stop offset="50%" stop-color="#1f60c0"/>
+      <stop offset="100%" stop-color="#0a3088"/>
+    </radialGradient>
+    <radialGradient id="gBlueDisk" cx="40%" cy="32%" r="64%">
+      <stop offset="0%" stop-color="#6aaaf0"/>
+      <stop offset="40%" stop-color="#2a68d0"/>
+      <stop offset="100%" stop-color="#0e3ca8"/>
+    </radialGradient>
+    <!-- Gold for center bolts -->
+    <radialGradient id="gGold" cx="32%" cy="25%" r="70%">
+      <stop offset="0%" stop-color="#fffbc0"/>
+      <stop offset="30%" stop-color="#f8d840"/>
+      <stop offset="65%" stop-color="#e0a000"/>
+      <stop offset="100%" stop-color="#8a5c00"/>
+    </radialGradient>
+    <radialGradient id="gGoldInner" cx="35%" cy="28%" r="65%">
+      <stop offset="0%" stop-color="#fff080"/>
+      <stop offset="50%" stop-color="#d09000"/>
+      <stop offset="100%" stop-color="#7a4800"/>
+    </radialGradient>
+    <!-- Drop shadow filter -->
+    <filter id="fShadow" x="-8%" y="-8%" width="120%" height="120%">
+      <feDropShadow dx="2" dy="3" stdDeviation="3" flood-color="#00000035"/>
+    </filter>
+    <filter id="fShadowSm" x="-10%" y="-10%" width="125%" height="125%">
+      <feDropShadow dx="1" dy="2" stdDeviation="2" flood-color="#00000030"/>
+    </filter>
+  </defs>
+
+  <!-- ===== BIG SILVER GEAR (28 teeth) center=(95,95) ===== -->
+  <g style="transform-origin:95px 95px; animation:bigCW 7s linear infinite;">
+    <!-- Gear teeth body -->
+    <path d="M 98.61 39.62 L 100.37 29.72 L 104.29 30.16 L 103.81 40.20 L 110.84 41.81 L 114.76 32.55 L 118.49 33.86 L 115.78 43.54 L 122.28 46.67 L 128.16 38.51 L 131.50 40.62 L 126.71 49.45 L 132.35 53.95 L 139.90 47.31 L 142.69 50.10 L 136.05 57.65 L 140.55 63.29 L 149.38 58.50 L 151.49 61.84 L 143.33 67.72 L 146.46 74.22 L 156.14 71.51 L 157.45 75.24 L 148.19 79.16 L 149.80 86.19 L 159.84 85.71 L 160.28 89.63 L 150.38 91.39 L 150.38 98.61 L 160.28 100.37 L 159.84 104.29 L 149.80 103.81 L 148.19 110.84 L 157.45 114.76 L 156.14 118.49 L 146.46 115.78 L 143.33 122.28 L 151.49 128.16 L 149.38 131.50 L 140.55 126.71 L 136.05 132.35 L 142.69 139.90 L 139.90 142.69 L 132.35 136.05 L 126.71 140.55 L 131.50 149.38 L 128.16 151.49 L 122.28 143.33 L 115.78 146.46 L 118.49 156.14 L 114.76 157.45 L 110.84 148.19 L 103.81 149.80 L 104.29 159.84 L 100.37 160.28 L 98.61 150.38 L 91.39 150.38 L 89.63 160.28 L 85.71 159.84 L 86.19 149.80 L 79.16 148.19 L 75.24 157.45 L 71.51 156.14 L 74.22 146.46 L 67.72 143.33 L 61.84 151.49 L 58.50 149.38 L 63.29 140.55 L 57.65 136.05 L 50.10 142.69 L 47.31 139.90 L 53.95 132.35 L 49.45 126.71 L 40.62 131.50 L 38.51 128.16 L 46.67 122.28 L 43.54 115.78 L 33.86 118.49 L 32.55 114.76 L 41.81 110.84 L 40.20 103.81 L 30.16 104.29 L 29.72 100.37 L 39.62 98.61 L 39.62 91.39 L 29.72 89.63 L 30.16 85.71 L 40.20 86.19 L 41.81 79.16 L 32.55 75.24 L 33.86 71.51 L 43.54 74.22 L 46.67 67.72 L 38.51 61.84 L 40.62 58.50 L 49.45 63.29 L 53.95 57.65 L 47.31 50.10 L 50.10 47.31 L 57.65 53.95 L 63.29 49.45 L 58.50 40.62 L 61.84 38.51 L 67.72 46.67 L 74.22 43.54 L 71.51 33.86 L 75.24 32.55 L 79.16 41.81 L 86.19 40.20 L 85.71 30.16 L 89.63 29.72 L 91.39 39.62 Z" fill="url(#gSilverTeeth)" filter="url(#fShadow)"/>
+    <!-- Rim ring outer edge (dark border) -->
+    <circle cx="95" cy="95" r="55.5" fill="url(#gSilverRim)"/>
+    <!-- Rim ring highlight (raised edge feel) -->
+    <circle cx="95" cy="95" r="53.5" fill="none" stroke="#d8d8d8" stroke-width="1.5"/>
+    <!-- Recessed disk face -->
+    <circle cx="95" cy="95" r="49.5" fill="url(#gSilverDisk)"/>
+    <!-- Inner rim shadow line -->
+    <circle cx="95" cy="95" r="49.5" fill="none" stroke="#909090" stroke-width="1"/>
+    <!-- Center bolt gold outer -->
+    <circle cx="95" cy="95" r="10" fill="url(#gGold)"/>
+    <!-- Center bolt gold inner -->
+    <circle cx="95" cy="95" r="6" fill="url(#gGoldInner)"/>
+    <!-- Center bolt highlight -->
+    <circle cx="92.5" cy="92.5" r="2.5" fill="#fffde0" opacity="0.7"/>
+  </g>
+
+  <!-- ===== SMALL BLUE GEAR (16 teeth) center=(169.30,153.05) ===== -->
+  <g style="transform-origin:169.30px 153.05px; animation:smCCW 4s linear infinite;">
+    <!-- Gear teeth body -->
+    <path d="M 172.90 121.54 L 174.65 116.00 L 178.53 116.78 L 178.03 122.56 L 184.69 125.32 L 188.42 120.87 L 191.71 123.07 L 189.03 128.22 L 194.13 133.32 L 199.28 130.64 L 201.47 133.92 L 197.03 137.66 L 199.79 144.32 L 205.57 143.82 L 206.34 147.69 L 200.81 149.44 L 200.81 156.65 L 206.34 158.40 L 205.57 162.28 L 199.79 161.78 L 197.03 168.44 L 201.47 172.17 L 199.28 175.46 L 194.13 172.78 L 189.03 177.88 L 191.71 183.03 L 188.42 185.22 L 184.69 180.78 L 178.03 183.54 L 178.53 189.32 L 174.65 190.09 L 172.90 184.56 L 165.69 184.56 L 163.94 190.09 L 160.07 189.32 L 160.57 183.54 L 153.91 180.78 L 150.17 185.22 L 146.89 183.03 L 149.57 177.88 L 144.47 172.78 L 139.32 175.46 L 137.12 172.17 L 141.57 168.44 L 138.81 161.78 L 133.03 162.28 L 132.25 158.40 L 137.79 156.65 L 137.79 149.44 L 132.25 147.69 L 133.03 143.82 L 138.81 144.32 L 141.57 137.66 L 137.12 133.92 L 139.32 130.64 L 144.47 133.32 L 149.57 128.22 L 146.89 123.07 L 150.17 120.87 L 153.91 125.32 L 160.57 122.56 L 160.07 116.78 L 163.94 116.00 L 165.69 121.54 Z" fill="url(#gBlueTeeth)" filter="url(#fShadowSm)"/>
+    <!-- Rim ring -->
+    <circle cx="169.30" cy="153.05" r="31.7" fill="url(#gBlueRim)"/>
+    <circle cx="169.30" cy="153.05" r="30.0" fill="none" stroke="#5080d8" stroke-width="1.2"/>
+    <!-- Recessed disk face -->
+    <circle cx="169.30" cy="153.05" r="27.0" fill="url(#gBlueDisk)"/>
+    <circle cx="169.30" cy="153.05" r="27.0" fill="none" stroke="#1448a0" stroke-width="0.8"/>
+    <!-- Center bolt -->
+    <circle cx="169.30" cy="153.05" r="7" fill="url(#gGold)"/>
+    <circle cx="169.30" cy="153.05" r="4" fill="url(#gGoldInner)"/>
+    <circle cx="167.3" cy="151.05" r="1.8" fill="#fffde0" opacity="0.7"/>
+  </g>
+
+  <style>
+    @keyframes bigCW  { from{transform:rotate(0deg)}   to{transform:rotate(360deg)} }
+    @keyframes smCCW  { from{transform:rotate(0deg)}   to{transform:rotate(-360deg)} }
+  </style>
+</svg></div>
+    <div><div class="lp-title">Hey there, Ndola! 👋</div><div style="font-size:11px;color:#2176b8;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;margin-top:2px;">CogWheel</div></div>
+  </div>
+  <div class="lp-body">
+    You are located in <strong>Ndola, Copperbelt</strong> — let us help you find the closest friends and <strong>potential customers</strong> right in your area! Our AI matches you with people who are looking for exactly what you offer.
+  </div>
+  <div class="lp-timer-bar"><div class="lp-timer-fill" id="lp-timer-fill"></div></div>
+  <div class="lp-actions">
+    <button class="lp-accept" onclick="acceptLocation()">✨ Find My Matches</button>
+    <button class="lp-dismiss" onclick="dismissLocation()">Later</button>
+  </div>
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<div class="mobile-bottom-nav" id="mobile-bottom-nav">
+  <div class="mobile-nav-items">
+    <div class="mobile-nav-item active" onclick="showSection('feed',this)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span class="mn-label">Home</span>
+    </div>
+    <div class="mobile-nav-item" onclick="showSection('explore',this)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <span class="mn-label">Explore</span>
+    </div>
+    <div class="mobile-nav-item mn-post" onclick="openPostModal()">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </div>
+    <div class="mobile-nav-item" onclick="showSection('messages',this)">
+      <span style="position:relative;display:inline-flex;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span class="mn-badge">3</span>
+      </span>
+      <span class="mn-label">Messages</span>
+    </div>
+    <div class="mobile-nav-item" onclick="showSection('profile',this)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span class="mn-label">Profile</span>
+    </div>
+  </div>
+</div>
+
+<!-- ========================= JAVASCRIPT ========================= -->
+<script>
+/* ============================================================================
+ * ⚠️ PROTOTYPE / DEMO ONLY — NO REAL BACKEND IS CONNECTED ANYWHERE IN THIS FILE
+ * ============================================================================
+ * Everything below runs 100% client-side with hardcoded arrays and localStorage-
+ * free, in-memory "state". There is NO server, NO database, NO real
+ * authentication, NO session/token handling, NO payment processing, and NO
+ * persistence of any kind — a page refresh wipes everything.
+ *
+ * Every place that needs real integration is marked with a comment block like:
+ *   // 🔴 REAL AUTH NEEDED: ...
+ *   // 🔴 REAL API NEEDED: ...
+ *   // 🔴 REAL UPLOAD/STORAGE NEEDED: ...
+ *   // 🔴 REAL PAYMENT NEEDED: ...
+ * Search for "🔴" to jump between every integration point in this file.
+ * ============================================================================ */
+
+// ===================== STATE =====================
+// 🔴 REAL AUTH NEEDED: currentUser should be hydrated from a verified server
+// session (e.g. decoded JWT / session cookie validated by your backend), not
+// initialized to a placeholder object and then overwritten client-side in
+// handleLogin()/handleRegister() with whatever the user typed into the form.
+let currentUser = { name: 'User', email: '', role: 'Content Creator', avatar: 'U' };
+let currentSection = 'feed';
+let activeConversation = null;
+let postsData = [];
+let filesData = [];
+let conversationsData = [];
+
+// ===================== AUTH =====================
+function switchAuthTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='login')||(i===1&&tab==='register')));
+  document.getElementById('login-form').classList.toggle('active', tab==='login');
+  document.getElementById('register-form').classList.toggle('active', tab==='register');
+}
+
+// 🔴 REAL AUTH NEEDED — handleLogin():
+// This function never actually authenticates anyone. It reads whatever
+// string is in the email field (falling back to a fake default), completely
+// IGNORES the password field's value, and fabricates a "logged in" user
+// object purely from parsing the email string. ANY input (or none) succeeds.
+// To make this real:
+//   1. Read #login-email AND #login-password (currently password is unused).
+//   2. Send credentials over HTTPS to a real auth endpoint, e.g.:
+//        const res = await fetch('/api/auth/login', {
+//          method: 'POST', headers: {'Content-Type':'application/json'},
+//          body: JSON.stringify({ email, password })
+//        });
+//   3. Verify the server response (invalid credentials -> show error, do NOT
+//      call launchApp()).
+//   4. Store the returned session token/cookie securely (httpOnly cookie
+//      set by the server is strongly preferred over localStorage/sessionStorage).
+//   5. Populate currentUser from the server's response payload, not from
+//      client-side string parsing of the email.
+//   6. Add rate limiting / brute-force protection, CSRF protection, and
+//      password hashing (bcrypt/argon2) on the SERVER side.
+function handleLogin() {
+  const email = document.getElementById('login-email').value || 'user@ndola.com';
+  const name = email.split('@')[0].replace(/[^a-zA-Z]/g,' ').trim() || 'Zola Mutale';
+  currentUser = { name: capitalizeWords(name) || 'Zola Mutale', email, role: 'Content Creator', avatar: (name[0]||'Z').toUpperCase() };
+  launchApp();
+}
+
+// 🔴 REAL AUTH NEEDED — handleRegister():
+// Same problem as handleLogin(): the password field (#reg-password) is read
+// nowhere in this function, there is no email format validation, no password
+// strength requirement, no duplicate-account check, and no account is
+// actually created anywhere — it just fakes a logged-in state locally.
+// To make this real:
+//   1. Read #reg-password and validate strength client-side (UX only —
+//      the server must re-validate, never trust the client).
+//   2. POST name/email/password/type to a real registration endpoint, e.g.:
+//        const res = await fetch('/api/auth/register', {
+//          method: 'POST', headers: {'Content-Type':'application/json'},
+//          body: JSON.stringify({ name, email, password, type })
+//        });
+//   3. Hash passwords server-side (bcrypt/argon2) — never store plaintext.
+//   4. Handle server errors (email already registered, weak password, etc.)
+//      and show them to the user instead of always calling launchApp().
+//   5. Consider email verification (confirmation link/OTP) before granting
+//      full access.
+//   6. Issue a real session/token on success, same as handleLogin().
+function handleRegister() {
+  const name = document.getElementById('reg-name').value || 'New User';
+  const email = document.getElementById('reg-email').value || 'user@ndola.com';
+  const type = document.getElementById('reg-type').value || 'Content Creator';
+  currentUser = { name: name || 'New User', email, role: type, avatar: (name[0]||'N').toUpperCase() };
+  launchApp();
+}
+
+function capitalizeWords(str) {
+  return str.split(' ').map(w => w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
+}
+
+// 🔴 REAL AUTH NEEDED — launchApp():
+// This is called immediately after the fake login/register above with no
+// actual verified session. There is no persistence at all: reloading the
+// page loses the "login" entirely because nothing is stored (and there's no
+// server session to restore from anyway).
+// To make this real:
+//   - Store the server-issued session token (prefer an httpOnly, Secure,
+//     SameSite cookie set by the backend over any client-readable storage).
+//   - On page load, check for an existing valid session (e.g. call
+//     GET /api/auth/me with the cookie/token) and auto-launch the app if
+//     valid, instead of always starting on the auth screen.
+//   - Route/guard every "section" below (feed, store, ads, analytics, etc.)
+//     so it actually requires a valid session, not just client-side display
+//     toggling of #main-app.
+function launchApp() {
+  const ap = document.getElementById('auth-page');
+  ap.style.display = 'none';
+  ap.style.zIndex = '-1';
+  document.getElementById('main-app').style.display = 'block';
+  // Show mobile bottom nav ONLY after successful login
+  const mbn = document.getElementById('mobile-bottom-nav');
+  if (mbn) { mbn.classList.add('show-nav'); }
+  // Set user info
+  document.getElementById('sidebar-name').textContent = currentUser.name;
+  document.getElementById('sidebar-role').textContent = currentUser.role;
+  document.getElementById('sidebar-avatar').innerHTML = currentUser.avatar + '<div class="online-dot"></div>';
+  document.getElementById('feed-avatar').textContent = currentUser.avatar;
+  document.getElementById('modal-avatar').textContent = currentUser.avatar;
+  document.getElementById('modal-name').textContent = currentUser.name;
+  document.getElementById('profile-avatar').textContent = currentUser.avatar;
+  document.getElementById('profile-name').textContent = currentUser.name;
+  document.getElementById('profile-role').textContent = currentUser.role + ' • Ndola, Zambia 📍';
+
+  initData();
+  renderPosts();
+  renderConversations();
+  renderNotifications();
+  renderStore();
+  renderSuggested();
+  renderTrending();
+  renderExplore();
+
+  // Animate algo bar
+  setTimeout(() => { document.getElementById('vis-bar').style.width = '87%'; }, 800);
+
+  // Show location popup after 3s
+  setTimeout(showLocationPopup, 3000);
+}
+
+// 🔴 REAL AUTH NEEDED — handleLogout():
+// This only hides UI elements and clears two form fields. No server session
+// or token is ever invalidated, so (once real auth exists) a stolen/old
+// token would still work after "logout".
+// To make this real: call something like
+//   await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+// and clear/expire the client-side copy of any token, then redirect/reset UI.
+function handleLogout() {
+  document.getElementById('main-app').style.display = 'none';
+  const ap = document.getElementById('auth-page');
+  ap.style.display = 'flex';
+  ap.style.zIndex = '9999';
+  // Hide bottom nav — only visible after login
+  const mbn = document.getElementById('mobile-bottom-nav');
+  if (mbn) { mbn.classList.remove('show-nav'); }
+  document.getElementById('login-email').value = '';
+  document.getElementById('login-password').value = '';
+}
+
+// ===================== NAV =====================
+function showSection(name, mobileItem) {
+  currentSection = name;
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('section-' + name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const titles = { feed:'🏠 Feed', explore:'🔍 Explore', messages:'💬 Messages', notifications:'🔔 Notifications', store:'🗂️ My Store', ads:'📣 Ads Manager', analytics:'📊 Analytics', profile:'👤 Profile', settings:'⚙️ Settings' };
+  document.getElementById('section-title').textContent = titles[name] || name;
+  // Update sidebar nav
+  document.querySelectorAll('.nav-item').forEach(n => { if(n.textContent.toLowerCase().includes(name) || n.onclick.toString().includes(`'${name}'`)) n.classList.add('active'); });
+  if(mobileItem) { document.querySelectorAll('.mobile-nav-item').forEach(i => i.classList.remove('active')); mobileItem.classList.add('active'); }
+  closeSidebar();
+  window.scrollTo(0,0);
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('show');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('show');
+}
+
+// ===================== INIT DATA =====================
+// 🔴 REAL API NEEDED — initData():
+// Everything in this function is hardcoded fake demo data (fake posts, fake
+// DM conversations with fake reply text, fake files). None of it is fetched
+// from anywhere and none of it is specific to currentUser.
+// To make this real, replace each hardcoded array with an authenticated
+// fetch to your backend, e.g.:
+//   postsData = await (await fetch('/api/feed', { credentials: 'include' })).json();
+//   conversationsData = await (await fetch('/api/conversations', {credentials:'include'})).json();
+//   filesData = await (await fetch('/api/store/files', {credentials:'include'})).json();
+// and handle loading/error states in the UI instead of instant hardcoded arrays.
+function initData() {
+  postsData = [
+    { id: 1, user: 'Zola Mutale', avatar: '👩🏾', role: 'Fashion Creator', time: '2 min ago', text: '✨ Just dropped my new collection! These hand-made African print dresses are flying off the shelves in Ndola. If you want one, DM me ASAP! 🔥🛍️ #NdolaFashion #AfricanPrints', emoji: '👗', likes: 234, comments: 42, shares: 18, liked: false, reactions: {}, commentsList: [{user:'Chanda M.',text:'These look absolutely amazing! 😍'}] },
+    { id: 2, user: 'Mutale Banda', avatar: '🧔🏿', role: 'Tech Entrepreneur', time: '15 min ago', text: '🚀 Big announcement! Our tech startup just secured K500,000 in funding! We\'re building Zambia\'s first AI-powered delivery app. Looking for developers and business partners in the Copperbelt region 💼', emoji: '💻', likes: 892, comments: 156, shares: 201, liked: false, reactions: {}, commentsList: [{user:'Bupe K.',text:'Congratulations Mutale! Count me in 🙌'}] },
+    { id: 3, user: 'Bupe Kapumba', avatar: '👩🏿', role: 'Food & Lifestyle', time: '1 hr ago', text: '🍲 Tried a new recipe today — Nshima with fresh kapenta from Lake Tanganyika + homemade relish 😍 There\'s nothing that hits like home-cooked Zambian food. Who else is a nshima lover? Drop a ❤️', emoji: '🍽️', likes: 1204, comments: 88, shares: 45, liked: false, reactions: {}, commentsList: [{user:'Luyando','text':'This looks SO good! Recipe please!'}] },
+    { id: 4, user: 'Luyando Tembo', avatar: '👩🏽', role: 'Business Owner', time: '3 hr ago', text: '📣 NDOLA MOTHERS! My beauty salon "Glow by Luyando" is now open in Kansenshi. We offer braids, weaves, facials, and nail art at the best prices in town 💅✨ Book your appointment today! #GlowByLuyando #NdolaBeauty', emoji: '💅', likes: 567, comments: 73, shares: 88, liked: false, reactions: {}, commentsList: [] },
+  ];
+
+  conversationsData = [
+    { id: 1, name: 'Zola Mutale', avatar: 'ZM', online: true, last: 'Thanks for the boost! 🙏', time: '2m', unread: 2, messages: [
+      { sent: false, text: 'Hey! I saw your post about ads 👀', time: '10:00' },
+      { sent: true, text: 'Hey Zola! Yes, I can help boost your fashion posts!', time: '10:02' },
+      { sent: false, text: 'Omg yes! How much would it cost?', time: '10:03' },
+      { sent: true, text: 'We have packages starting from K50. Let me send you the details.', time: '10:05' },
+      { sent: false, text: 'Thanks for the boost! 🙏', time: '10:10' },
+    ]},
+    { id: 2, name: 'Mutale Banda', avatar: 'MB', online: true, last: 'Can we collab on the app?', time: '15m', unread: 1, messages: [
+      { sent: false, text: 'Hi! I saw your profile on CogWheel', time: '09:00' },
+      { sent: true, text: 'Hello Mutale! Great to connect 🤝', time: '09:05' },
+      { sent: false, text: 'Can we collab on the app?', time: '09:30' },
+    ]},
+    { id: 3, name: 'Bupe Kapumba', avatar: 'BK', online: false, last: 'Recipe coming tomorrow 😄', time: '2h', unread: 0, messages: [
+      { sent: false, text: 'Love your food content!', time: 'Yesterday' },
+      { sent: true, text: 'Thank you so much! 😊 I post every Thursday', time: 'Yesterday' },
+      { sent: false, text: 'Recipe coming tomorrow 😄', time: 'Yesterday' },
+    ]},
+    { id: 4, name: 'Luyando Tembo', avatar: 'LT', online: true, last: 'Come visit the salon!', time: '5h', unread: 0, messages: [
+      { sent: false, text: 'Come visit the salon!', time: '08:00' },
+    ]},
+  ];
+
+  filesData = [
+    { name: 'Summer Collection 2026.jpg', size: '4.2 MB', type: '🖼️', date: 'Apr 8, 2026', tags: ['Photo','Fashion'] },
+    { name: 'Brand Intro Video.mp4', size: '128 MB', type: '🎥', date: 'Apr 6, 2026', tags: ['Video','Promo'] },
+    { name: 'Business Proposal.pdf', size: '2.1 MB', type: '📄', date: 'Apr 5, 2026', tags: ['Doc','Business'] },
+    { name: 'Jingle - Ad 1.mp3', size: '3.8 MB', type: '🎵', date: 'Apr 3, 2026', tags: ['Audio','Ad'] },
+    { name: 'Product Catalog.pdf', size: '8.4 MB', type: '📄', date: 'Apr 1, 2026', tags: ['Doc','Catalog'] },
+    { name: 'Behind the Scenes.mp4', size: '89 MB', type: '🎥', date: 'Mar 28, 2026', tags: ['Video','BTS'] },
+    { name: 'Logo Pack.zip', size: '1.2 MB', type: '🗜️', date: 'Mar 25, 2026', tags: ['Design'] },
+    { name: 'March Photoshoot.jpg', size: '6.7 MB', type: '🖼️', date: 'Mar 20, 2026', tags: ['Photo'] },
+  ];
+}
+
+// ===================== POSTS =====================
+function renderPosts() {
+  const container = document.getElementById('posts-container');
+  container.innerHTML = '';
+  postsData.forEach(post => {
+    container.appendChild(createPostEl(post));
+  });
+}
+
+function createPostEl(post) {
+  const el = document.createElement('div');
+  el.className = 'post-card';
+  el.id = 'post-' + post.id;
+  el.innerHTML = `
+    <div class="post-header">
+      <div class="user-avatar" style="background:linear-gradient(135deg,var(--blue),var(--purple));font-size:22px;">${post.avatar}</div>
+      <div class="post-user-info">
+        <div class="name">${post.user}</div>
+        <div class="meta">${post.role} • ${post.time}</div>
+      </div>
+      <div class="post-menu">⋮</div>
+    </div>
+    <div class="post-text">${post.text}</div>
+    <div class="post-image-placeholder">${post.emoji}</div>
+    <div class="post-stats">
+      <span onclick="showReactions(${post.id})">${post.likes} reactions</span>
+      <span onclick="toggleComments(${post.id})">${post.comments} comments</span>
+      <span>${post.shares} shares</span>
+    </div>
+    <div class="post-divider"></div>
+    <div class="post-actions">
+      <div class="post-action-wrap">
+        <button class="post-action-btn like ${post.liked?'liked':''}" id="like-btn-${post.id}" onclick="likePost(${post.id})">
+          ${post.liked?'❤️':'🤍'} <span id="like-count-${post.id}">${post.likes}</span>
+        </button>
+        <div class="reactions-popup">
+          <span class="reaction-btn" onclick="reactPost(${post.id},'❤️')">❤️</span>
+          <span class="reaction-btn" onclick="reactPost(${post.id},'😂')">😂</span>
+          <span class="reaction-btn" onclick="reactPost(${post.id},'😮')">😮</span>
+          <span class="reaction-btn" onclick="reactPost(${post.id},'😢')">😢</span>
+          <span class="reaction-btn" onclick="reactPost(${post.id},'🔥')">🔥</span>
+          <span class="reaction-btn" onclick="reactPost(${post.id},'👏')">👏</span>
+        </div>
+      </div>
+      <button class="post-action-btn comment" onclick="toggleComments(${post.id})">💬 <span>${post.comments}</span></button>
+      <button class="post-action-btn share" onclick="sharePost(${post.id})">🔄 Share</button>
+    </div>
+    <div class="comments-section" id="comments-${post.id}">
+      <div id="comments-list-${post.id}">${post.commentsList.map(c => `
+        <div class="comment-item">
+          <div class="user-avatar" style="width:32px;height:32px;font-size:13px;">${c.user[0]}</div>
+          <div class="comment-bubble">
+            <div class="commenter">${c.user}</div>
+            <div class="comment-text">${c.text}</div>
+          </div>
+        </div>`).join('')}
+      </div>
+      <div class="comment-input-row">
+        <div class="user-avatar" style="width:32px;height:32px;font-size:13px;">${currentUser.avatar}</div>
+        <input type="text" placeholder="Write a comment..." id="comment-input-${post.id}" onkeydown="if(event.key==='Enter')submitComment(${post.id})">
+        <button class="send-comment-btn" onclick="submitComment(${post.id})">➤</button>
+      </div>
+    </div>
+  `;
+  return el;
+}
+
+// 🔴 REAL API NEEDED — likePost() / reactPost() below:
+// Likes/reactions only mutate the in-memory postsData array and the DOM.
+// Nothing is sent to a server, so likes vanish on refresh and aren't visible
+// to any other user. Needs something like:
+//   await fetch(`/api/posts/${id}/like`, { method:'POST', credentials:'include' });
+// and ideally optimistic UI update + rollback on failure.
+function likePost(id) {
+  const post = postsData.find(p => p.id === id);
+  if (!post) return;
+  post.liked = !post.liked;
+  post.likes += post.liked ? 1 : -1;
+  const btn = document.getElementById('like-btn-' + id);
+  const count = document.getElementById('like-count-' + id);
+  btn.innerHTML = `${post.liked?'❤️':'🤍'} <span id="like-count-${id}">${post.likes}</span>`;
+  btn.classList.toggle('liked', post.liked);
+  if (post.liked) { btn.style.transform = 'scale(1.3)'; setTimeout(() => btn.style.transform = 'scale(1)', 300); }
+}
+
+function reactPost(id, emoji) {
+  const post = postsData.find(p => p.id === id);
+  if (!post) return;
+  post.liked = true;
+  post.likes++;
+  const btn = document.getElementById('like-btn-' + id);
+  if (btn) btn.querySelector('span') && (btn.querySelector('span').textContent = post.likes);
+}
+
+function toggleComments(id) {
+  const sec = document.getElementById('comments-' + id);
+  if (sec) sec.classList.toggle('open');
+}
+
+// 🔴 REAL API NEEDED — submitComment():
+// Comments are appended to the DOM and local array only — never persisted
+// server-side, never sanitized/escaped (raw text is inserted via innerHTML,
+// which is also an XSS risk — see note below), and never visible to other
+// users. Needs a real POST to something like /api/posts/:id/comments, and
+// the comment text should be inserted safely (e.g. via textContent or a
+// proper sanitizer) rather than concatenated into innerHTML.
+function submitComment(id) {
+  const input = document.getElementById('comment-input-' + id);
+  const text = input.value.trim();
+  if (!text) return;
+  const list = document.getElementById('comments-list-' + id);
+  const el = document.createElement('div');
+  el.className = 'comment-item';
+  el.innerHTML = `
+    <div class="user-avatar" style="width:32px;height:32px;font-size:13px;">${currentUser.avatar}</div>
+    <div class="comment-bubble">
+      <div class="commenter">${currentUser.name}</div>
+      <div class="comment-text">${text}</div>
+    </div>`;
+  list.appendChild(el);
+  input.value = '';
+  const post = postsData.find(p => p.id === id);
+  if (post) post.comments++;
+}
+
+// 🔴 REAL API NEEDED — sharePost(): the native navigator.share() call is
+// real, but the share COUNT is only incremented locally and never reported
+// to a server, so it won't persist or reflect actual shares by other users.
+function sharePost(id) {
+  const post = postsData.find(p => p.id === id);
+  if (!post) return;
+  post.shares++;
+  showToast('🔄 Post shared successfully!');
+  if (navigator.share) navigator.share({ title: 'Check this out on CogWheel!', text: post.text, url: window.location.href });
+}
+
+function openPostModal(type) {
+  document.getElementById('post-modal').classList.add('open');
+  if (type) document.getElementById('post-textarea').placeholder = type === 'photo' ? '📷 Share a photo and tell the story...' : type === 'video' ? '🎥 Add a caption to your video...' : type === 'ad' ? '📣 Write your ad copy here...' : 'What\'s on your mind?';
+}
+
+// 🔴 REAL API NEEDED / 🔴 REAL UPLOAD/STORAGE NEEDED — submitPost():
+// New posts are only pushed into the local postsData array and prepended to
+// the DOM — nothing is sent to a server, so posts disappear on refresh and
+// are invisible to any other user. Also note the post modal supports
+// attaching photo/video via handleFileUpload() (see below) but the actual
+// selected file is NEVER included in the post that gets submitted here —
+// only the caption text is used.
+// To make this real:
+//   1. If media was attached, upload the file first (e.g. multipart/form-data
+//      to /api/uploads or directly to object storage like S3/Cloudinary via
+//      a signed URL from your backend) and get back a persisted media URL.
+//   2. POST { text, mediaUrl } to /api/posts, get back the created post
+//      (with server-assigned id/timestamp) and prepend THAT to the feed
+//      instead of a client-fabricated object with Date.now() as the id.
+//   3. Validate/sanitize post text server-side (length limits, profanity/
+//      abuse filtering, etc. per your platform policy).
+function submitPost() {
+  const text = document.getElementById('post-textarea').value.trim();
+  if (!text) { document.getElementById('post-textarea').style.borderColor = 'var(--red)'; return; }
+  const newPost = {
+    id: Date.now(),
+    user: currentUser.name,
+    avatar: currentUser.avatar,
+    role: currentUser.role,
+    time: 'Just now',
+    text: text,
+    emoji: '📝',
+    likes: 0,
+    comments: 0,
+    shares: 0,
+    liked: false,
+    reactions: {},
+    commentsList: []
+  };
+  postsData.unshift(newPost);
+  const container = document.getElementById('posts-container');
+  container.insertBefore(createPostEl(newPost), container.firstChild);
+  closeModal('post-modal');
+  document.getElementById('post-textarea').value = '';
+  showToast('🚀 Post published successfully!');
+  addNotification({ type: 'ad', icon: '🚀', text: '<strong>Your post</strong> has been published! Our algorithm is showing it to the right audience in Ndola.' });
+}
+
+// ===================== MODALS =====================
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+// Click outside to close
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+// ===================== MESSAGES =====================
+function renderConversations() {
+  const list = document.getElementById('conversations-list');
+  list.innerHTML = conversationsData.map(c => `
+    <div class="conv-item" onclick="openConversation(${c.id})">
+      <div class="conv-avatar">${c.avatar}
+        <div class="conv-online ${c.online?'on':'off'}"></div>
+      </div>
+      <div class="conv-info">
+        <div class="cname">${c.name}</div>
+        <div class="clast">${c.last}</div>
+      </div>
+      <div class="conv-meta">
+        <div class="ctime">${c.time}</div>
+        ${c.unread > 0 ? `<div class="cunread">${c.unread}</div>` : ''}
+      </div>
+    </div>`).join('');
+}
+
+function openConversation(id) {
+  activeConversation = conversationsData.find(c => c.id === id);
+  if (!activeConversation) return;
+  document.getElementById('chat-name').textContent = activeConversation.name;
+  document.getElementById('chat-status').textContent = activeConversation.online ? '● Online' : '● Offline';
+  document.getElementById('chat-avatar').textContent = activeConversation.avatar;
+  const msgs = document.getElementById('chat-messages');
+  msgs.innerHTML = activeConversation.messages.map(m => `
+    <div class="msg-bubble-wrap ${m.sent?'sent':''}">
+      ${!m.sent ? `<div class="conv-avatar" style="width:32px;height:32px;font-size:12px;">${activeConversation.avatar}</div>` : ''}
+      <div>
+        <div class="msg-bubble">${m.text}</div>
+        <div class="msg-time">${m.time}</div>
+      </div>
+    </div>`).join('');
+  msgs.scrollTop = msgs.scrollHeight;
+  // Mobile: show chat window
+  document.getElementById('msg-list').classList.remove('show');
+  document.getElementById('chat-window').classList.remove('hidden');
+  // Mark read
+  activeConversation.unread = 0;
+  renderConversations();
+}
+
+// 🔴 REAL API NEEDED — sendMessage():
+// Messages are pushed into a local array only and, worse, the "reply" from
+// the other person is entirely FAKED with a setTimeout + a hardcoded array
+// of canned responses (`replies`) — no real messages are ever sent to or
+// received from another user.
+// To make this real:
+//   1. POST the outgoing message to something like
+//        await fetch(`/api/conversations/${activeConversation.id}/messages`, {
+//          method:'POST', credentials:'include',
+//          body: JSON.stringify({ text }) });
+//   2. Receive real incoming messages via WebSocket / Server-Sent Events /
+//      a push notification service instead of the fake setTimeout below —
+//      delete the `replies` array and random-reply simulation entirely.
+//   3. Persist conversation history server-side so it survives refresh and
+//      syncs across devices.
+function sendMessage() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text || !activeConversation) return;
+  const msg = { sent: true, text, time: new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) };
+  activeConversation.messages.push(msg);
+  activeConversation.last = text;
+  const msgs = document.getElementById('chat-messages');
+  const el = document.createElement('div');
+  el.className = 'msg-bubble-wrap sent';
+  el.innerHTML = `<div><div class="msg-bubble">${text}</div><div class="msg-time">${msg.time}</div></div>`;
+  msgs.appendChild(el);
+  msgs.scrollTop = msgs.scrollHeight;
+  input.value = '';
+  // Simulate reply
+  setTimeout(() => {
+    const replies = ['Sounds great! 🔥','Thanks for reaching out 🙏','Let\'s make it happen! 🚀','Wow, interesting! Tell me more...','I\'ll check that out 👀','Perfect timing! 😄'];
+    const reply = { sent: false, text: replies[Math.floor(Math.random()*replies.length)], time: new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) };
+    activeConversation.messages.push(reply);
+    const el2 = document.createElement('div');
+    el2.className = 'msg-bubble-wrap';
+    el2.innerHTML = `<div class="conv-avatar" style="width:32px;height:32px;font-size:12px;">${activeConversation.avatar}</div><div><div class="msg-bubble">${reply.text}</div><div class="msg-time">${reply.time}</div></div>`;
+    msgs.appendChild(el2);
+    msgs.scrollTop = msgs.scrollHeight;
+    activeConversation.last = reply.text;
+    renderConversations();
+  }, 1200 + Math.random()*1000);
+}
+
+function backToConvList() {
+  document.getElementById('msg-list').classList.add('show');
+  document.getElementById('chat-window').classList.add('hidden');
+}
+
+// ===================== NOTIFICATIONS =====================
+// 🔴 REAL API NEEDED: this whole array is hardcoded fake notification
+// history for a fake user. In a real app this should be fetched from the
+// server (e.g. GET /api/notifications) and new notifications should arrive
+// via WebSocket/SSE/push, not be invented client-side by addNotification()
+// whenever a local UI action happens (see addNotification()/createAd() below).
+let notificationsData = [
+  { id:1, type:'like', icon:'❤️', text:'<strong>Zola Mutale</strong> and 23 others reacted to your post', time:'2 min ago', unread:true },
+  { id:2, type:'comment', icon:'💬', text:'<strong>Mutale Banda</strong> commented: "This is exactly what I needed!"', time:'10 min ago', unread:true },
+  { id:3, type:'follow', icon:'👥', text:'<strong>Bupe Kapumba</strong> started following you', time:'25 min ago', unread:true },
+  { id:4, type:'ad', icon:'📣', text:'Your ad campaign reached <strong>1,200 people</strong> in Ndola today! 🎯', time:'1 hr ago', unread:true },
+  { id:5, type:'like', icon:'🔥', text:'Your post is trending in <strong>Ndola, Copperbelt!</strong>', time:'2 hr ago', unread:false },
+  { id:6, type:'comment', icon:'💬', text:'<strong>Luyando Tembo</strong> replied to your comment', time:'3 hr ago', unread:false },
+  { id:7, type:'follow', icon:'👥', text:'<strong>Chanda Mwansa</strong> and 5 others followed you', time:'5 hr ago', unread:false },
+];
+
+function renderNotifications() {
+  const list = document.getElementById('notifications-list');
+  list.innerHTML = notificationsData.map(n => `
+    <div class="notif-item ${n.unread?'unread':''}" onclick="markRead(${n.id})">
+      <div class="notif-icon ${n.type}">${n.icon}</div>
+      <div class="notif-content">
+        <div class="notif-text">${n.text}</div>
+        <div class="notif-time">${n.time}</div>
+      </div>
+      ${n.unread ? '<div class="notif-dot"></div>' : ''}
+    </div>`).join('');
+}
+
+// 🔴 REAL API NEEDED: marking a notification read only updates local state —
+// should PATCH/POST to something like /api/notifications/:id/read so it
+// stays read across devices/sessions.
+function markRead(id) {
+  const n = notificationsData.find(n => n.id === id);
+  if (n) { n.unread = false; renderNotifications(); }
+}
+
+// Note: addNotification() below is used to locally fabricate notifications
+// in response to the user's OWN actions (e.g. createAd()). Real notifications
+// (someone else liking/commenting/following/etc.) must come from the server.
+function addNotification(n) {
+  n.id = Date.now();
+  n.time = 'Just now';
+  n.unread = true;
+  notificationsData.unshift(n);
+  renderNotifications();
+}
+
+// ===================== STORE =====================
+function renderStore() {
+  const grid = document.getElementById('store-grid');
+  grid.innerHTML = filesData.map((f,i) => `
+    <div class="file-card" style="animation-delay:${i*0.05}s">
+      <span class="file-icon">${f.type}</span>
+      <div class="file-name">${f.name}</div>
+      <div class="file-size">${f.size}</div>
+      <div class="file-date">${f.date}</div>
+      <div class="file-tags">${f.tags.map(t=>`<span class="file-tag">${t}</span>`).join('')}</div>
+    </div>`).join('');
+}
+
+function openUploadModal() {
+  document.getElementById('upload-modal').classList.add('open');
+}
+
+// 🔴 REAL UPLOAD/STORAGE NEEDED — uploadFile():
+// This does NOT actually upload the file selected via handleStoreUpload()
+// below. It completely ignores the real file object and instead fabricates
+// a fake filename/size/type/date with Math.random(). No bytes are ever sent
+// anywhere, so nothing is actually stored.
+// To make this real:
+//   1. Build a FormData with the real File object from the <input type=file>.
+//   2. POST it to a real upload endpoint or get a signed URL and upload
+//      directly to object storage (S3/GCS/Cloudinary/etc.):
+//        const fd = new FormData(); fd.append('file', file);
+//        const res = await fetch('/api/store/upload', {method:'POST', body:fd, credentials:'include'});
+//   3. Use the real file's name/size/MIME type returned from the server,
+//      not randomly generated placeholders.
+//   4. Enforce file size/type limits and virus/malware scanning server-side.
+function uploadFile() {
+  const desc = document.getElementById('file-desc').value.trim() || 'New File';
+  const types = ['🖼️','🎥','📄','🎵','🗜️'];
+  filesData.unshift({
+    name: desc + '.file',
+    size: Math.floor(Math.random()*100) + ' MB',
+    type: types[Math.floor(Math.random()*types.length)],
+    date: 'Apr 9, 2026',
+    tags: ['New','Upload']
+  });
+  renderStore();
+  document.getElementById('store-stats-area').querySelector('.ss-val').textContent = filesData.length;
+  closeModal('upload-modal');
+  showToast('✅ File uploaded successfully!');
+}
+
+function triggerFile(type) { document.getElementById('file-input-' + type).click(); }
+// 🔴 REAL UPLOAD/STORAGE NEEDED — handleFileUpload():
+// URL.createObjectURL() only creates a temporary LOCAL preview blob URL that
+// only works in this browser tab and is never uploaded anywhere. It is also
+// never attached to the post created in submitPost() above — attaching real
+// media to a post requires uploading this `file` object to storage first
+// (see uploadFile() notes) and passing the resulting persistent URL into the
+// post payload.
+function handleFileUpload(input, type) {
+  const file = input.files[0];
+  if (!file) return;
+  const prev = document.getElementById('media-preview');
+  if (type === 'image') {
+    const url = URL.createObjectURL(file);
+    prev.innerHTML = `<img src="${url}" style="width:100%;border-radius:12px;margin-bottom:12px;max-height:200px;object-fit:cover">`;
+  } else {
+    prev.innerHTML = `<div style="background:var(--bg2);border-radius:12px;padding:12px;font-size:13px;color:var(--text2);margin-bottom:12px;">🎥 ${file.name}</div>`;
+  }
+}
+// 🔴 REAL UPLOAD/STORAGE NEEDED — handleStoreUpload(): only copies the
+// filename into a text field; the actual file is discarded and never used
+// by uploadFile() above (see that function's notes).
+function handleStoreUpload(input) {
+  const file = input.files[0];
+  if (file) document.getElementById('file-desc').value = file.name;
+}
+
+// ===================== SUGGESTED / TRENDING =====================
+// 🔴 REAL API NEEDED: hardcoded fake users/recommendations. Should come from
+// a real recommendation endpoint (e.g. GET /api/users/suggested) driven by
+// the actual user's activity, not a static array shown to everyone.
+const suggestedUsersData = [
+  { name: 'Chanda Mwansa', meta: 'Ndola • Tech Creator', avatar: 'CM', style: 'background:linear-gradient(135deg,#f093fb,#f5576c)' },
+  { name: 'Mumba Kalinda', meta: 'Kitwe • Fashion', avatar: 'MK', style: 'background:linear-gradient(135deg,var(--green),var(--blue))' },
+  { name: 'Nakamba Phiri', meta: 'Ndola • Entrepreneur', avatar: 'NP', style: 'background:linear-gradient(135deg,var(--accent),var(--accent2))' },
+];
+
+function renderSuggested() {
+  document.getElementById('suggested-users').innerHTML = suggestedUsersData.map(u => `
+    <div class="suggested-user">
+      <div class="user-avatar" style="width:36px;height:36px;font-size:13px;${u.style}">${u.avatar}</div>
+      <div class="sug-info">
+        <div class="sug-name">${u.name}</div>
+        <div class="sug-meta">${u.meta}</div>
+      </div>
+      <button class="follow-btn" onclick="toggleFollow(this)">Follow</button>
+    </div>`).join('');
+}
+
+// 🔴 REAL API NEEDED — toggleFollow(): only flips a CSS class/button label.
+// No follow relationship is ever recorded. Needs something like
+//   await fetch(`/api/users/${userId}/follow`, {method:'POST'|'DELETE', credentials:'include'});
+// and the button's initial state should reflect real follow status fetched
+// from the server, not always start unfollowed.
+function toggleFollow(btn) {
+  const isFollowing = btn.classList.toggle('following');
+  btn.textContent = isFollowing ? '✓ Following' : 'Follow';
+}
+
+// 🔴 REAL API NEEDED: hardcoded fake trending hashtags — should come from a
+// real trending/aggregation endpoint (e.g. GET /api/trending), typically
+// computed server-side from real post volume over a time window.
+const trendingData = [
+  { topic: '#NdolaFashion', posts: '2.4K posts' },
+  { topic: '#CopperbeltBiz', posts: '1.8K posts' },
+  { topic: '#ZambiaTech', posts: '4.1K posts' },
+  { topic: '#NdolaEats', posts: '890 posts' },
+  { topic: '#CogWheelZambia', posts: '3.2K posts' },
+];
+
+function renderTrending() {
+  document.getElementById('trending-topics').innerHTML = trendingData.map(t => `
+    <div class="trending-item">
+      <div class="t-topic">${t.topic}</div>
+      <div class="t-posts">${t.posts}</div>
+    </div>`).join('');
+}
+
+// ===================== EXPLORE =====================
+// 🔴 REAL API NEEDED — renderExplore(): `exploreItems` is a hardcoded fake
+// directory shown identically to every user. Should be fetched from a real
+// discovery/search endpoint (e.g. GET /api/explore), ideally paginated and
+// personalized, with the "+ Connect" button wired to the same real follow
+// API described in toggleFollow() above.
+function renderExplore() {
+  const grid = document.getElementById('explore-grid');
+  const exploreItems = [
+    { name: 'Zola Mutale', type: 'Fashion Creator', emoji: '👩🏾', bg: 'linear-gradient(135deg,var(--accent),var(--purple))' },
+    { name: 'TechHub Ndola', type: 'Business', emoji: '💻', bg: 'linear-gradient(135deg,var(--blue),var(--purple))' },
+    { name: 'Bupe\'s Kitchen', type: 'Food Creator', emoji: '🍲', bg: 'linear-gradient(135deg,var(--green),var(--blue))' },
+    { name: 'Glow Beauty', type: 'Salon & Spa', emoji: '💅', bg: 'linear-gradient(135deg,#f093fb,#f5576c)' },
+    { name: 'Ndola Eats', type: 'Food Guide', emoji: '🍽️', bg: 'linear-gradient(135deg,#f7971e,#ffd200)' },
+    { name: 'CopperBelt Biz', type: 'Business Network', emoji: '🏢', bg: 'linear-gradient(135deg,var(--accent2),var(--green))' },
+    { name: 'Luyando Tembo', type: 'Lifestyle', emoji: '✨', bg: 'linear-gradient(135deg,#a78bfa,#06b6d4)' },
+    { name: 'Zambia Sports', type: 'Sports & Fitness', emoji: '⚽', bg: 'linear-gradient(135deg,#34d399,#059669)' },
+  ];
+  grid.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;">` +
+    exploreItems.map(item => `
+    <div class="file-card" style="text-align:center;cursor:pointer;">
+      <div style="width:64px;height:64px;border-radius:50%;${item.bg};display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 12px;box-shadow:0 8px 20px rgba(0,0,0,0.3);">${item.emoji}</div>
+      <div class="file-name">${item.name}</div>
+      <div class="file-size" style="margin-top:4px;">${item.type}</div>
+      <button class="follow-btn" style="margin-top:10px;width:100%;padding:7px;" onclick="toggleFollow(this)">+ Connect</button>
+    </div>`).join('') + `</div>`;
+}
+
+// ===================== LOCATION POPUP =====================
+// 🔴 REAL API NEEDED — showLocationPopup()/acceptLocation() below:
+// acceptLocation() never actually requests the browser's real geolocation
+// (no navigator.geolocation.getCurrentPosition call) and never sends
+// anything to a server — the "47 potential customers near you" figure is a
+// hardcoded string, not a real query result.
+// To make this real:
+//   1. Request location permission properly:
+//        navigator.geolocation.getCurrentPosition(pos => {...}, err => {...});
+//   2. Send the resulting coordinates to a real backend matching/ads
+//      endpoint (e.g. POST /api/ads/nearby-audience) over HTTPS.
+//   3. Handle permission-denied / unsupported-browser cases gracefully.
+//   4. Store location consent server-side per applicable privacy law/consent
+//      requirements — don't just discard or fake the outcome.
+function showLocationPopup() {
+  document.getElementById('location-popup').classList.add('show');
+  setTimeout(() => {
+    const p = document.getElementById('location-popup');
+    if (p.classList.contains('show')) dismissLocation();
+  }, 45000);
+}
+
+function acceptLocation() {
+  dismissLocation();
+  showToast('🎯 Great! We\'re finding your best matches in Ndola...');
+  setTimeout(() => showToast('✅ Found 47 potential customers near you!'), 2500);
+}
+
+function dismissLocation() {
+  document.getElementById('location-popup').classList.remove('show');
+}
+
+// ===================== UTILS =====================
+function showToast(message) {
+  const existing = document.getElementById('toast');
+  if (existing) existing.remove();
+  const toast = document.createElement('div');
+  toast.id = 'toast';
+  toast.style.cssText = `
+    position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--card2); border: 1px solid var(--border2); border-radius: 14px;
+    padding: 12px 22px; font-size: 14px; font-weight: 600; color: var(--text);
+    z-index: 9999; box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    animation: toastIn 0.4s cubic-bezier(.23,1,.32,1) forwards;
+    white-space: nowrap;
+  `;
+  toast.innerHTML = message;
+  document.body.appendChild(toast);
+  const style = document.createElement('style');
+  style.textContent = `@keyframes toastIn { from { opacity:0; transform:translateX(-50%) translateY(20px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }`;
+  document.head.appendChild(style);
+  setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.3s'; setTimeout(() => toast.remove(), 300); }, 3000);
+}
+
+function activateChip(el) {
+  el.closest('.tab-chips').querySelectorAll('.tab-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function toggleChip(el) {
+  el.classList.toggle('active');
+}
+
+function viewStory(name) {
+  showToast('▶️ Viewing ' + name + '\'s story...');
+}
+
+// 🔴 REAL API NEEDED / 🔴 REAL PAYMENT NEEDED — createAd():
+// This instantly shows a success toast and a fake notification — no ad
+// campaign is ever created server-side, no budget/targeting/payment is
+// collected, and nothing is actually launched or billed.
+// To make this real:
+//   1. Collect real campaign inputs (budget, duration, targeting, creative)
+//      instead of unconditionally "succeeding".
+//   2. POST the campaign to a real backend (e.g. POST /api/ads/campaigns).
+//   3. Integrate a real payment processor (e.g. Stripe/PayPal/mobile money
+//      provider relevant to your market) to actually charge the advertiser
+//      before/as the campaign is created — PCI compliance means card data
+//      should go directly to the payment processor, never touch your own
+//      server unencrypted.
+//   4. Only show the success toast / add the notification after the server
+//      confirms the campaign was created and payment succeeded.
+function createAd() {
+  showToast('📣 Ad campaign created! Launching now...');
+  addNotification({ type:'ad', icon:'📣', text:'Your new ad campaign is <strong>live</strong>! Targeting Ndola & Copperbelt region.' });
+}
+
+// ===================== KEYBOARD SHORTCUTS =====================
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
+    dismissLocation();
+  }
+});
+
+// ===================== RESPONSIVE =====================
+window.addEventListener('resize', () => {
+  if (window.innerWidth > 768) {
+    document.getElementById('msg-list').classList.add('show');
+    document.getElementById('chat-window').classList.remove('hidden');
+  }
+});
+</script>
+</body>
+</html>
